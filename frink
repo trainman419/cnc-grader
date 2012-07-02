@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# Shell file to start frink in command-line mode.
+
+######  Begin configurable parameters ######
+
+# Change this to the path to your frink.jar file
+jar=/home/hendrix/crash-n-compile/grader/frink.jar
+
+# Change this to the path to your java interpreter.
+java=/usr/bin/java
+
+######  End configurable parameters ######
+
+flags=
+
+# Set flags to empty if we're running interactively, otherwise allow
+# greater use of memory if running a program.
+# In addition, use the "server" virtual machine if we're running a program.
+# This increases startup time, but makes programs run about twice as fast
+# in the long run.  Note that the server JVM may only ship with the full
+# Sun Java Development Kit (JDK), and not the JRE.
+# These flags are appropriate for the Sun JVM, and may need to be changed
+# for other JVMs.
+if [ $# -eq 0 ]
+   then flags=
+   else flags="-server -Xmx500M"
+fi
+
+$java $flags -classpath $jar frink.gui.FrinkStarter "$@"
