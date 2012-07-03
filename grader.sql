@@ -23,5 +23,7 @@ create table if not exists submissions (
       userid int not null,
       foreign key (userid) references users (id),
       time int unsigned not null,
-      result bit not null,
+      problem int not null,
+      filename text not null,
+      result int not null,
       note text null);

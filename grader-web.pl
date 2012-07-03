@@ -45,11 +45,15 @@
 #
 
 use strict;
-use CGI qw/:standard/;
+use CGI qw/:standard *table/;
 use DBI;
 use Crypt::PasswdMD5;
 use Crypt::Random qw( makerandom makerandom_octet );
 use MIME::Base64;
+use File::Copy;
+
+# define problem number
+my $problem = 0;
 
 # create database connection
 
@@ -58,6 +62,7 @@ my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
 
 my $session = cookie('sessionID');
 my $cookie = undef;
+my $user = undef;
 my $debug = "";
 
 if( not $dbh ) {
@@ -114,7 +119,7 @@ sub landing() {
                # TODO: links
                li(a({href=>"$url?problem="},"Problem description")),
                li(a({href=>"$url?upload="}, "Upload source")),
-               li("View results"),
+               li(a({href=>"$url?results="},"View results")),
                li("View standings"),
                li("Change password"),
                li(
@@ -128,7 +133,7 @@ sub landing() {
 }
 
 # display the upload page
-sub upload() {
+sub upload_page() {
    print header(-cookie=>$cookie),
          start_html("Upload"),
          h1({-align=>'center'},"Upload");
@@ -143,6 +148,7 @@ sub upload() {
       print p("Sorry, you are not allowed to upload submissions at this time");
    }
    print p($debug),
+         p("User: $user"),
          div({-align=>'center'}, a({href=>url}, "Home")),
          end_html;
 }
@@ -163,6 +169,36 @@ sub problem() {
          end_html;
 }
 
+sub results() {
+   print header(-cookie=>$cookie),
+         start_html("Results"),
+         h1({-align=>'center'},"Results");
+
+   # get submissions
+   my $rows = $dbh->selectall_arrayref('select userid, time, problem, result from submissions');
+
+   print start_table;
+   print Tr(td(["UserID", "Time", "Problem", "Result"]));
+   for my $row (@$rows) {
+      $row->[1] = localtime($row->[1]);
+      if( $row->[3] == 0 ) {
+         $row->[3] = "Not yet graded";
+      } elsif( $row->[3] == 1 ) {
+         $row->[3] = "Passed";
+      } elsif( $row->[3] == 2 ) {
+         $row->[3] = "Failed";
+      } else {
+         $row->[3] = "Unknown State";
+      }
+      print Tr(td($row));
+   }
+   print end_table;
+
+   print p($debug),
+         div({-align=>'center'}, a({href=>url}, "Home")),
+         end_html;
+}
+
 # if logout, clear the session cookie
 if( param('Logout') ) {
    if( $session ) {
@@ -170,8 +206,6 @@ if( param('Logout') ) {
    }
    $session = "";
 }
-
-my $user = undef;
 
 # validate sessionID
 if( $session ) {
@@ -221,6 +255,24 @@ if( param('Login') ) {
    }
 }
 
+# receive uploaded file
+if( $session ) {
+   my $upload_fh = upload('file');
+   if( defined $upload_fh ) {
+      my $infile = param('file');
+      $debug = "Got uploaded file $infile";
+      my $infile_path = tmpFileName($infile);
+      my $outpath = "/tmp/crashandcompile/$user/$infile";
+
+      mkdir "/tmp/crashandcompile";
+      mkdir "/tmp/crashandcompile/$user";
+      copy($infile_path, $outpath);
+      # TODO: add to submissions table
+      $dbh->do('insert into submissions (userid, time, problem, filename) '.
+            'values (?, ?, ?, ?)', undef, ($user, time(), $problem, $infile));
+   }
+}
+
 $cookie = cookie(-name=>'sessionID', -value=>$session);
 
 if( not defined $session or $session eq '') {
@@ -228,7 +280,9 @@ if( not defined $session or $session eq '') {
 } elsif( defined param('problem') ) {
    problem();
 } elsif( defined param('upload') ) {
-   upload();
+   upload_page();
+} elsif( defined param('results') ) {
+   results();
 } else {
    landing();
 }
