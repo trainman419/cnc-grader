@@ -32,13 +32,17 @@
 # Database schema:
 #  users table: id, username, password hash, start time
 #  session table: session id, userid, last use
-#  submissions table: id, submission time, result (pass/fail), notes
+#  submissions table: id, submission time, problem, file, result, notes
 #  results table?
 #  problems table?
 #
+# Filesystem layout:
+#  /tmp/crashandcompile/
+#                       <userID>/ - uploads
+#                       problems/<problem>/ - problem files
+#                       tmp/ - grading temp space
+#
 # TODO:
-#  receive file uploads
-#  results page
 #  standings page
 #  password change page
 #  links on landing page

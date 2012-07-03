@@ -1,0 +1,11 @@
+TODO:
+ - Finish web interface:
+  - standings page
+  - change password page
+  - problem display page
+ - cronjob grader
+  - crontab snippet
+  - filesystem locations for problems and tmp space
+  - integrate grader with DB
+ - grader.py
+  - execution timeout: 1 minute

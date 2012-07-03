@@ -9,7 +9,9 @@ if len(sys.argv) < 3 or len(sys.argv) > 4:
 
 source = sys.argv[1]
 input_file = sys.argv[2]
-(basename,a,extension) = source.rpartition(".")
+
+sourcepath = source.split('/')
+(basename,a,extension) = sourcepath[-1].rpartition(".")
 
 # TODO: take submissions with a makefile
 # TODO: take submissions as a tarball
@@ -25,14 +27,15 @@ elif extension == "c":
    comp = "gcc -o %s %s"%(basename, source)
    executable = "./%s"%basename
 elif extension == "java":
-   comp = "javac %s"%source
+   comp = "cp %s . ; javac %s.java"%(source, basename)
    executable = "java %s"%basename
 elif extension == "frink":
    executable = "frink %s"%source
 else:
    # assume interpreted
    comp = "chmod u+x %s"%source
-   executable = "./%s"%source
+   if not source.startswith('/'):
+      executable = "./%s"%source
 
 executable = "%s < %s"%(executable, input_file)
 
@@ -45,6 +48,9 @@ if comp:
    # TODO: timeout rather than wait forever
    if comp_cmd.wait():
       print "Compilation failed"
+      (out,err) = comp_cmd.communicate()
+      print out
+      print err
       sys.exit(1)
 
 # Run the test program

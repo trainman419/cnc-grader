@@ -5,7 +5,7 @@
 ######  Begin configurable parameters ######
 
 # Change this to the path to your frink.jar file
-jar=/home/hendrix/crash-n-compile/grader/frink.jar
+jar=/home/hendrix/crash-n-compile/cnc_2012/grader/frink.jar
 
 # Change this to the path to your java interpreter.
 java=/usr/bin/java
