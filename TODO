@@ -2,5 +2,6 @@ TODO:
  - Finish web interface:
   - standings page
   - implement time limits
+  - button/form to start qualification time
  - grader.py
   - execution timeout: 1 minute
