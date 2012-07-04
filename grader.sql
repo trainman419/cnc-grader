@@ -10,7 +10,7 @@ create table if not exists users (
       id int auto_increment primary key not null, 
       email text not null,
       password text not null,
-      start datetime);
+      start int);
 
 create table if not exists session (
       id char(128) primary key not null,
