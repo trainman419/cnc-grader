@@ -67,7 +67,7 @@ def main(source, input_file, output_file=None):
     executable = "%s < %s" % (executable, input_file)
 
     if output_file:
-        executable = "%s | diff -B - %s" % (executable, output_file)
+        executable = "%s | diff -Bb - %s" % (executable, output_file)
 
     # Run the test program
     exec_cmd = subprocess.Popen(executable, shell=True, stdout=subprocess.PIPE,
