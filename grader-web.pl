@@ -59,6 +59,8 @@ use File::Copy;
 # define problem number
 my $problem = 0;
 
+my $basedir = "/tmp/crashandcompile";
+
 # create database connection
 
 my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
@@ -125,7 +127,7 @@ sub landing() {
                li(a({href=>"$url?upload="}, "Upload source")),
                li(a({href=>"$url?results="},"View results")),
                li("View standings"),
-               li("Change password"),
+               li(a({href=>"$url?passwd="},"Change password")),
                li(
                   start_form,
                   submit(-name=>'Logout', -value=>'Logout'),
@@ -143,11 +145,13 @@ sub upload_page() {
          h1({-align=>'center'},"Upload");
 
    if( check_timeslot() ) {
-      print start_form({-align=>'center'}),
-            filefield('file'),
-            br,
-            submit,
-            end_form;
+      print div({-align=>'center'},
+               start_form,
+               filefield('file'),
+               br,
+               submit(-name=>'Upload', -value=>'Upload'),
+               end_form
+            );
    } else {
       print p("Sorry, you are not allowed to upload submissions at this time");
    }
@@ -164,6 +168,12 @@ sub problem() {
          h1({-align=>'center'},"Problem Description");
 
    if( check_timeslot() ) {
+      my $problem_file = "$basedir/problems/$problem/problem.html";
+      if( -e $problem_file ) {
+         open FILE, $problem_file;
+         print <FILE>;
+         close FILE;
+      }
    } else {
       print p("Sorry, no problems are available at this time");
    }
@@ -199,6 +209,28 @@ sub results() {
    print end_table;
 
    print p($debug),
+         div({-align=>'center'}, a({href=>url}, "Home")),
+         end_html;
+}
+
+sub passwd() {
+   print header(-cookie=>$cookie),
+         start_html("Change Password"),
+         h1({-align=>'center'},"Change Password"),
+         div({-align=>'center'},
+            start_form,
+            table(
+               Tr(td(["Old Password", password_field(-name=>'old',
+                        -size=>40,-maxlength=>100)])),
+               Tr(td(["New Password", password_field(-name=>'new',
+                        -size=>40,-maxlength=>100)])),
+               Tr(td(["New Password (again)", password_field(-name=>'new_',
+                        -size=>40,-maxlength=>100)])),
+               Tr(td(["", submit(-name=>'Change', -value=>'Change Password')]))
+               ),
+            end_form
+            ),
+         p($debug),
          div({-align=>'center'}, a({href=>url}, "Home")),
          end_html;
 }
@@ -259,8 +291,8 @@ if( param('Login') ) {
    }
 }
 
-# receive uploaded file
 if( $session ) {
+   # receive uploaded file
    my $upload_fh = upload('file');
    if( defined $upload_fh ) {
       my $infile = param('file');
@@ -275,6 +307,35 @@ if( $session ) {
       $dbh->do('insert into submissions (userid, time, problem, filename) '.
             'values (?, ?, ?, ?)', undef, ($user, time(), $problem, $infile));
    }
+
+   # handle password change
+   if( defined param('Change') ) {
+      param('passwd','');
+      $debug = "Password not changed";
+      my $old = param('old');
+      my $new = param('new');
+      my $new_ = param('new_');
+      # Check old password
+      my $row = $dbh->selectrow_arrayref('select password from users where id = ?', undef, $user);
+      if( $row->[0] eq unix_md5_crypt($old, $row->[0]) ) {
+         if( $new eq $new_ ) {
+            if( $new eq '' ) {
+               $debug = "Password can't be empty";
+            } else {
+               # TODO: update DB
+               my $hash = unix_md5_crypt($new);
+               $dbh->do('update users set password = ? where id = ?',
+                     undef, ($hash, $user));
+               $debug = "Password Updated";
+               Delete('passwd');
+            }
+         } else {
+            $debug = "New passwords don't match";
+         }
+      } else {
+         $debug = "Invalid old password";
+      }
+   }
 }
 
 $cookie = cookie(-name=>'sessionID', -value=>$session);
@@ -287,6 +348,8 @@ if( not defined $session or $session eq '') {
    upload_page();
 } elsif( defined param('results') ) {
    results();
+} elsif( defined param('passwd') ) {
+   passwd();
 } else {
    landing();
 }
