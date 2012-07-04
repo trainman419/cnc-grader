@@ -1,6 +1,6 @@
 TODO:
  - Finish web interface:
   - standings page
- - archive all submissions
  - grader.py
   - execution timeout: 1 minute
+ - handle submissions with spaces

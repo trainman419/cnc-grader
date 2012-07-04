@@ -329,15 +329,20 @@ if( $session ) {
    if( defined $upload_fh ) {
       my $infile = param('file');
       $debug = "Got uploaded file $infile";
+      my $now = time();
       my $infile_path = tmpFileName($infile);
-      my $outpath = "/tmp/crashandcompile/$user/$infile";
+      my $outpath = "$basedir/$user/$infile";
+      my $archive = "$basedir/archive/$user/$now-$infile";
 
-      mkdir "/tmp/crashandcompile";
-      mkdir "/tmp/crashandcompile/$user";
+      mkdir "$basedir";
+      mkdir "$basedir/$user";
+      mkdir "$basedir/archive";
+      mkdir "$basedir/archive/$user";
       copy($infile_path, $outpath);
+      copy($infile_path, $archive);
       # add to submissions table
       $dbh->do('insert into submissions (userid, time, problem, filename) '.
-            'values (?, ?, ?, ?)', undef, ($user, time(), $problem, $infile));
+            'values (?, ?, ?, ?)', undef, ($user, $now, $problem, $infile));
    }
 
    # handle password change
