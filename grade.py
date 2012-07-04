@@ -19,22 +19,26 @@ sourcepath = source.split('/')
 
 comp = None
 executable = source
+output = None
 
 if extension == "cpp":
    comp = "gcc -o %s %s"%(basename, source)
    executable = "./%s"%basename
+   output = basename
 elif extension == "c":
    comp = "gcc -o %s %s"%(basename, source)
    executable = "./%s"%basename
+   output = basename
 elif extension == "java":
    comp = "cp %s . ; javac %s.java"%(source, basename)
    executable = "java %s"%basename
+   output = "%s.class"%basename
 elif extension == "frink":
-   executable = "frink %s"%source
+   executable = "/home/hendrix/bin/frink %s"%source
 else:
    # assume interpreted
    comp = "chmod u+x %s"%source
-   if not source.startswith('/'):
+   if len(sourcepath) < 2:
       executable = "./%s"%source
 
 executable = "%s < %s"%(executable, input_file)
@@ -58,6 +62,13 @@ exec_cmd = subprocess.Popen(executable, shell=True, stdout=subprocess.PIPE, stde
 # TODO: timeout rather than wait forever
 if exec_cmd.wait():
    print "Execution failed"
+   (out,err) = exec_cmd.communicate()
+   #print out
+   #print err
+   if output:
+      os.remove(output)
    sys.exit(2)
 
 print "%s passed"%source
+if output:
+   os.remove(output)

@@ -3,6 +3,7 @@ TODO:
   - standings page
   - change password page
   - problem display page
+  - implement time limits
  - cronjob grader
   - crontab snippet
   - filesystem locations for problems and tmp space

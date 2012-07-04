@@ -28,6 +28,9 @@ for my $user (keys %users) {
    opendir DIR, "$basedir/$user";
    my @files = readdir(DIR);
    closedir DIR;
+
+   my $email = "";
+
    for my $file (@files) {
       if( not $file =~ m/^\./ ) {
          my $row = $dbh->selectrow_arrayref('select id,problem,time from submissions where filename = ? order by time desc limit 1', undef, $file);
@@ -44,36 +47,62 @@ for my $user (keys %users) {
             opendir DIR, $problem_dir or die "Failed to open problem directory $problem_dir";
             my @problem_files = readdir(DIR);
             closedir DIR;
+
             my @input;
             for my $problem_file (@problem_files) {
                if( $problem_file =~ m/^in/ ) {
                   push @input, $problem_file;
                }
             }
+
+            my $pass = 1;
             
             for my $input_file (@input) {
                my $output_file = $input_file;
                $output_file =~ s/^in/out/;
                if( -e "$problem_dir/$output_file" ) {
                   my $cmd = "$grader $basedir/$user/$file $problem_dir/$input_file $problem_dir/$output_file";
-#                  print "Running $cmd\n";
                   my $output = `$cmd`;
                   my $res = $?;
                   if( $res ) {
-                     print "Grading $file failed: $output\n";
-                  } else {
-                     print "$file passed!\n";
+                     $email .= "Problem $problem: $file failed:\n$output\n";
+                     $pass = 0;
                   }
                } else {
                   print "Missing output for $problem_dir/$input_file\n";
                }
             }
 
-
+            if( $pass ) {
+               $dbh->do('update submissions set result = 1 where id = ?',
+                     undef, $id);
+               $email .= "Problem $problem: $file passed.\n";
+            } else {
+               $dbh->do('update submissions set result = 2 where id = ?',
+                     undef, $id);
+            }
          } else {
             print "Found submission from $user without DB entry: $file\n";
          }
-         print "\n";
+
+#         unlink("$basedir/$user/$file");
+
+         if( $email ne "" ) {
+            $email .= "\n";
+         }
       }
+   }
+
+   # TODO: send email
+   if( $email ne "" ) {
+      print "Sending email to $users{$user}:\n";
+      print $email;
+      open EMAIL, "|/usr/sbin/sendmail -t -f 'hendrix\@namniart.com'";
+      print EMAIL "To: $users{$user}\n";
+      print EMAIL "From: Crash and Compile Grader <hendrix\@namniart.com>\n";
+      print EMAIL "Subject: Crash and Compile Grader Results\n";
+      print EMAIL "Content-type: text/plain\n\n";
+      print EMAIL $email;
+      close EMAIL;
    }
 }

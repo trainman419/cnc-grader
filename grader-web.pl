@@ -186,7 +186,7 @@ sub results() {
    for my $row (@$rows) {
       $row->[1] = localtime($row->[1]);
       if( $row->[3] == 0 ) {
-         $row->[3] = "Not yet graded";
+         $row->[3] = "Not graded";
       } elsif( $row->[3] == 1 ) {
          $row->[3] = "Passed";
       } elsif( $row->[3] == 2 ) {
