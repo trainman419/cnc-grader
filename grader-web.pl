@@ -57,9 +57,10 @@ use MIME::Base64;
 use File::Copy;
 
 # define problem number
-my $problem = 0;
+my $problem = 1;
 
 my $basedir = "/tmp/crashandcompile";
+my $timelimit = 60 * 60 * 2; # 2 hours
 
 # create database connection
 
@@ -69,6 +70,7 @@ my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
 my $session = cookie('sessionID');
 my $cookie = undef;
 my $user = undef;
+my $start = undef;
 my $debug = "";
 
 if( not $dbh ) {
@@ -81,7 +83,11 @@ if( not $dbh ) {
 }
 
 sub check_timeslot() {
-   return 1;
+   if( defined $start ) {
+      return time() < ($timelimit + $start);
+   } else {
+      return 0;
+   }
 }
 
 # display the login page
@@ -121,21 +127,49 @@ sub landing() {
    print header(-cookie=>$cookie),
          start_html("Crash and Compile"),
          h1({-align=>'center'}, "Crash and Compile"),
-         ul(
-               # TODO: links
-               li(a({href=>"$url?problem="},"Problem description")),
-               li(a({href=>"$url?upload="}, "Upload source")),
-               li(a({href=>"$url?results="},"View results")),
-               li("View standings"),
-               li(a({href=>"$url?passwd="},"Change password")),
-               li(
-                  start_form,
-                  submit(-name=>'Logout', -value=>'Logout'),
-                  end_form
-                 )
-               ),
+         CGI::start_ul(),
+         li(a({href=>"$url?problem="},"Problem description")),
+         li(a({href=>"$url?upload="}, "Upload source")),
+         li(a({href=>"$url?results="},"View results")),
+         li("View standings"),
+         li(a({href=>"$url?passwd="},"Change password")),
+         li(
+            start_form,
+            submit(-name=>'Logout', -value=>'Logout'),
+            end_form
+           );
+
+   if( defined $start ) {
+      my $remain = ($start + $timelimit) - time();
+      if( $remain > 0 ) {
+         my $hours = int($remain / 3600);
+         my $minutes = int(($remain % 3600) / 60);
+         my $seconds = int(($remain % 60 ));
+         print li(sprintf("%d:%02d:%02d remaining\n",$hours,$minutes,$seconds));
+      } else {
+         print li("Time limit expired");
+      }
+   } else {
+      print li(
+               start_form,
+               submit(-name=>'Start', -value=>'Start Qualification'),
+               end_form
+            );
+   }
+
+   print CGI::end_ul(),
          p($debug),
          end_html;
+}
+
+sub problem_desc($) {
+   my ($p) = @_;
+   my $problem_file = "$basedir/problems/$p/problem.html";
+   if( -e $problem_file ) {
+      open FILE, $problem_file;
+      print <FILE>;
+      close FILE;
+   }
 }
 
 # display the upload page
@@ -144,17 +178,15 @@ sub upload_page() {
          start_html("Upload"),
          h1({-align=>'center'},"Upload");
 
-   if( check_timeslot() ) {
-      print div({-align=>'center'},
-               start_form,
-               filefield('file'),
-               br,
-               submit(-name=>'Upload', -value=>'Upload'),
-               end_form
-            );
-   } else {
-      print p("Sorry, you are not allowed to upload submissions at this time");
-   }
+   problem_desc($problem);
+
+   print div({-align=>'center'},
+            start_form,
+            filefield('file'),
+            br,
+            submit(-name=>'Upload', -value=>'Upload'),
+            end_form
+         );
    print p($debug),
          p("User: $user"),
          div({-align=>'center'}, a({href=>url}, "Home")),
@@ -167,16 +199,7 @@ sub problem() {
          start_html("Problem Description"),
          h1({-align=>'center'},"Problem Description");
 
-   if( check_timeslot() ) {
-      my $problem_file = "$basedir/problems/$problem/problem.html";
-      if( -e $problem_file ) {
-         open FILE, $problem_file;
-         print <FILE>;
-         close FILE;
-      }
-   } else {
-      print p("Sorry, no problems are available at this time");
-   }
+   problem_desc($problem);
 
    print p($debug),
          div({-align=>'center'}, a({href=>url}, "Home")),
@@ -245,8 +268,7 @@ if( param('Logout') ) {
 
 # validate sessionID
 if( $session ) {
-   my $row = $dbh->selectrow_hashref('select * from session where id = ?',
-         undef, $session);
+   my $row = $dbh->selectrow_hashref('select userid,last_used from session where id = ?', undef, $session);
    if( $row ) {
       $user = $row->{'userid'};
       my $last_used = $row->{'last_used'};
@@ -256,6 +278,10 @@ if( $session ) {
       if( $now - $last_used < 60*60 ) {
          $dbh->do('update session set last_used = ? where id = ?', undef,
                ($now, $session));
+
+         $row = $dbh->selectrow_hashref('select start from users where id = ?',
+               undef, $user);
+         $start = $row->{'start'};
       } else {
          $debug = "Session timed out";
          # clear DB
@@ -274,7 +300,7 @@ if( param('Login') ) {
    my $pass = param('password');
    param('password','');
 
-   my $row = $dbh->selectrow_hashref('select * from users where email = ?',
+   my $row = $dbh->selectrow_hashref('select id,password,start from users where email = ?',
          undef, $email);
    if( $row ) {
       my $hash = $row->{'password'};
@@ -284,6 +310,7 @@ if( param('Login') ) {
          $session = encode_base64(makerandom_octet(Length=>(96)));
          $session =~ s/\n//g;
          $user = $row->{'id'};
+         $start = $row->{'start'};
          # insert into session table
          $dbh->do('insert into session (id, userid, last_used) values (?,?,?)',
                undef, ($session, $user, time()));
@@ -292,6 +319,11 @@ if( param('Login') ) {
 }
 
 if( $session ) {
+   # if time is expired, show the sample problem
+   if( not check_timeslot() ) {
+      $problem = 0;
+   }
+
    # receive uploaded file
    my $upload_fh = upload('file');
    if( defined $upload_fh ) {
@@ -303,7 +335,7 @@ if( $session ) {
       mkdir "/tmp/crashandcompile";
       mkdir "/tmp/crashandcompile/$user";
       copy($infile_path, $outpath);
-      # TODO: add to submissions table
+      # add to submissions table
       $dbh->do('insert into submissions (userid, time, problem, filename) '.
             'values (?, ?, ?, ?)', undef, ($user, time(), $problem, $infile));
    }
@@ -334,6 +366,14 @@ if( $session ) {
          }
       } else {
          $debug = "Invalid old password";
+      }
+   }
+
+   if( defined param('Start') ) {
+      if( not defined $start ) {
+         $start = time();
+         $dbh->do('update users set start = ? where id = ?', undef, 
+               ($start, $user));
       }
    }
 }
