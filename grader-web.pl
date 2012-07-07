@@ -37,7 +37,7 @@
 #  problems table?
 #
 # Filesystem layout:
-#  /tmp/crashandcompile/
+#  /opt/crashandcompile/
 #                       <userID>/ - uploads
 #                       problems/<problem>/ - problem files
 #                       tmp/ - grading temp space
@@ -59,7 +59,7 @@ use File::Copy;
 # define problem number
 my $problem = 1;
 
-my $basedir = "/tmp/crashandcompile";
+my $basedir = "/opt/crashandcompile";
 my $timelimit = 60 * 60 * 2; # 2 hours
 
 # create database connection

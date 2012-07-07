@@ -7,7 +7,7 @@ use DBI;
 my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
       "crashncompile") or die "Can't connect to database: $DBH::errstr";
 
-my $basedir = "/tmp/crashandcompile";
+my $basedir = "/opt/crashandcompile";
 my $grader = "/home/hendrix/crash-n-compile/cnc_2012/grader/grade.py";
 
 chdir("$basedir/tmp");
