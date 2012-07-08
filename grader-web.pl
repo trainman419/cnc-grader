@@ -60,7 +60,7 @@ use File::Copy;
 my $problem = 1;
 
 my $basedir = "/opt/crashandcompile";
-my $timelimit = 60 * 60 * 2; # 2 hours
+my $timelimit = 60 * 60 * 3; # 3 hours
 
 # create database connection
 
