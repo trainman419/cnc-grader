@@ -150,11 +150,14 @@ sub landing() {
          print li("Time limit expired");
       }
    } else {
-      print li(
-               start_form,
-               submit(-name=>'Start', -value=>'Start Qualification'),
-               end_form
-            );
+      my $row = $dbh->selectrow_arrayref('select count(*) from submissions where result = 1 and problem = 0 and userid = ?', undef, $user);
+      if( $row->[0] > 0 ) {
+         print li(
+                  start_form,
+                  submit(-name=>'Start', -value=>'Start Qualification'),
+                  end_form
+               );
+      }
    }
 
    print CGI::end_ul(),
@@ -212,20 +215,21 @@ sub results() {
          h1({-align=>'center'},"Results");
 
    # get submissions
-   my $rows = $dbh->selectall_arrayref('select userid, time, problem, result from submissions');
+   my $rows = $dbh->selectall_arrayref('select time, problem, result from submissions where userid = ?',
+	undef, $user);
 
    print start_table;
-   print Tr(td(["UserID", "Time", "Problem", "Result"]));
+   print Tr(td(["Time", "Problem", "Result"]));
    for my $row (@$rows) {
-      $row->[1] = localtime($row->[1]);
-      if( $row->[3] == 0 ) {
-         $row->[3] = "Not graded";
-      } elsif( $row->[3] == 1 ) {
-         $row->[3] = "Passed";
-      } elsif( $row->[3] == 2 ) {
-         $row->[3] = "Failed";
+      $row->[0] = localtime($row->[0]);
+      if( $row->[2] == 0 ) {
+         $row->[2] = "Not graded";
+      } elsif( $row->[2] == 1 ) {
+         $row->[2] = "Passed";
+      } elsif( $row->[2] == 2 ) {
+         $row->[2] = "Failed";
       } else {
-         $row->[3] = "Unknown State";
+         $row->[2] = "Unknown State";
       }
       print Tr(td($row));
    }
