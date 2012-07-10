@@ -34,7 +34,7 @@ def try_compile(source):
         output = "%s.class" % basename
 
     elif extension == "frink":
-        executable = "/home/hendrix/bin/frink %s" % source
+        executable = "/home/ubuntu/cnc_2012/grader/frink %s" % source
 
     else:
         # assume interpreted
