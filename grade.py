@@ -87,6 +87,11 @@ def main(source, input_file, output_file=None):
         # timeout. kill process and fail
         exec_cmd.kill()
         print "Execution timed out"
+        ret = exec_cmd.poll()
+        while ret == None:
+           exec_cmd.send_signal(9)
+           time.sleep(1)
+           ret = exec_cmd.poll()
         result = 2
     elif ret:
         # program execution failed
@@ -108,17 +113,6 @@ def main(source, input_file, output_file=None):
         else:
             print "%s passed"%source
 
-#    # TODO: timeout rather than wait forever
-#    if exec_cmd.wait():
-#        print "Execution failed"
-#        (out, err) = exec_cmd.communicate()
-#        #print out
-#        #print err
-#        if output:
-#            os.remove(output)
-#        sys.exit(2)
-#
-#    print "%s passed" % source
     if output:
         os.remove(output)
 
