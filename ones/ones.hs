@@ -16,6 +16,6 @@ countOnes n = foldr (\x y -> (ones x) + y) 0 [0..n]
 
 
 main = do
-  xs <- getArgs
-  let arg' = read (head xs) :: Int
+  xs <- getLine
+  let arg' = read xs :: Int
   print $ countOnes arg'
