@@ -215,21 +215,21 @@ sub results() {
          h1({-align=>'center'},"Results");
 
    # get submissions
-   my $rows = $dbh->selectall_arrayref('select time, problem, result, note from submissions where userid = ?',
+   my $rows = $dbh->selectall_arrayref('select time, filename, problem, result, note from submissions where userid = ?',
 	undef, $user);
 
    print start_table;
-   print Tr(td(["Time", "Problem", "Result", "Notes"]));
+   print Tr(td(["Time", "File", "Problem", "Result", "Notes"]));
    for my $row (@$rows) {
       $row->[0] = localtime($row->[0]);
-      if( $row->[2] == 0 ) {
-         $row->[2] = "Not graded";
-      } elsif( $row->[2] == 1 ) {
-         $row->[2] = "Passed";
-      } elsif( $row->[2] == 2 ) {
-         $row->[2] = "Failed";
+      if( $row->[3] == 0 ) {
+         $row->[3] = "Not graded";
+      } elsif( $row->[3] == 1 ) {
+         $row->[3] = "Passed";
+      } elsif( $row->[3] == 2 ) {
+         $row->[3] = "Failed";
       } else {
-         $row->[2] = "Unknown State";
+         $row->[3] = "Unknown State";
       }
       print Tr(td($row));
    }

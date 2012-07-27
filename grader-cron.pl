@@ -99,7 +99,7 @@ for my $user (keys %users) {
             print "Found submission from $user without DB entry: $file\n";
          }
 
-#         unlink("$basedir/$user/$file");
+         unlink("$basedir/$user/$file");
 
          if( $email ne "" ) {
             $email .= "\n";
