@@ -8,7 +8,7 @@ my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
       "crashncompile") or die "Can't connect to database: $DBH::errstr";
 
 my $basedir = "/opt/crashandcompile";
-my $grader = "/home/hendrix/crash-n-compile/cnc_2012/grader/grade.py";
+my $grader = "/home/turtlebot/cnc_2012/grader/grade.py";
 
 chdir("$basedir/tmp");
 
@@ -55,7 +55,9 @@ for my $user (keys %users) {
                }
             }
 
-            my $pass = 1;
+            my $pass = 0;
+            my $total = scalar(@input);
+            my $error = "";
             
             for my $input_file (@input) {
                my $output_file = $input_file;
@@ -63,17 +65,25 @@ for my $user (keys %users) {
                if( -e "$problem_dir/$output_file" ) {
                   my $cmd = "$grader $basedir/$user/$file $problem_dir/$input_file $problem_dir/$output_file";
                   my $output = `$cmd`;
-                  my $res = $?;
+                  my $res = ($? >> 8);
                   if( $res ) {
-                     $email .= "Problem $problem: $file failed:\n$output\n";
-                     $pass = 0;
+                     $email .= "Problem $problem: $file failed:\n$output ($res)\n";
+                  } else {
+                     $pass++;
+                  }
+                  if( $res == 1 ) {
+                     $error = "Compilation Failed";
+                     last;
+                  } elsif( $res == 2 ) {
+                     $error = "Execution timed out";
+                     last;
                   }
                } else {
                   print "Missing output for $problem_dir/$input_file\n";
                }
             }
 
-            if( $pass ) {
+            if( $pass == $total ) {
                $dbh->do('update submissions set result = 1 where id = ?',
                      undef, $id);
                $email .= "Problem $problem: $file passed.\n";
@@ -81,11 +91,15 @@ for my $user (keys %users) {
                $dbh->do('update submissions set result = 2 where id = ?',
                      undef, $id);
             }
+            my $message = "Passed $pass of $total";
+            $error and $message = $error;
+            $dbh->do('update submissions set note = ? where id = ?',
+                     undef, ($message, $id));
          } else {
             print "Found submission from $user without DB entry: $file\n";
          }
 
-         unlink("$basedir/$user/$file");
+#         unlink("$basedir/$user/$file");
 
          if( $email ne "" ) {
             $email .= "\n";
@@ -97,12 +111,12 @@ for my $user (keys %users) {
    if( $email ne "" ) {
       print "Sending email to $users{$user}:\n";
       print $email;
-      open EMAIL, "|/usr/sbin/sendmail -t -f 'hendrix\@namniart.com'";
-      print EMAIL "To: $users{$user}\n";
-      print EMAIL "From: Crash and Compile Grader <hendrix\@namniart.com>\n";
-      print EMAIL "Subject: Crash and Compile Grader Results\n";
-      print EMAIL "Content-type: text/plain\n\n";
-      print EMAIL $email;
-      close EMAIL;
+#      open EMAIL, "|/usr/sbin/sendmail -t -f 'hendrix\@namniart.com'";
+#      print EMAIL "To: $users{$user}\n";
+#      print EMAIL "From: Crash and Compile Grader <hendrix\@namniart.com>\n";
+#      print EMAIL "Subject: Crash and Compile Grader Results\n";
+#      print EMAIL "Content-type: text/plain\n\n";
+#      print EMAIL $email;
+#      close EMAIL;
    }
 }

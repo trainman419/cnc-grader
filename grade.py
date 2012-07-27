@@ -35,7 +35,7 @@ def try_compile(source):
         output = "%s.class" % basename
 
     elif extension == "frink":
-        executable = "/home/ubuntu/cnc_2012/grader/frink %s" % source
+        executable = "/home/turtlebot/cnc_2012/grader/frink %s" % source
 
     else:
         # assume interpreted
@@ -47,7 +47,6 @@ def try_compile(source):
     if comp:
         comp_cmd = subprocess.Popen(comp, shell=True, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE)
-        # TODO: timeout rather than wait forever
         if comp_cmd.wait():
             print "Compilation failed"
             (out, err) = comp_cmd.communicate()
@@ -65,18 +64,14 @@ def main(source, input_file, output_file=None):
 
     executable, output = try_compile(source)
 
-    executable = "%s < %s" % (executable, input_file)
-
-#    if output_file:
-#        executable = "%s | diff -Bb - %s" % (executable, output_file)
-
     # Run the test program
-    exec_cmd = subprocess.Popen(executable, shell=True, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+    exec_cmd = subprocess.Popen(executable, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                stdin=open(input_file))
     # 60-second time limit
     ret = exec_cmd.poll()
     i = 0
-    while i < 60 and ret == None:
+    while i < 6 and ret == None:
         i += 1
         ret = exec_cmd.poll()
         time.sleep(1)
@@ -96,7 +91,7 @@ def main(source, input_file, output_file=None):
     elif ret:
         # program execution failed
         print "Program execution failed with return code %d"%ret
-        result = 2
+        result = 3
     else:
         if output_file:
             (out, err) = exec_cmd.communicate()
@@ -107,7 +102,7 @@ def main(source, input_file, output_file=None):
             ret = diff_cmd.wait()
             if ret:
                 print "%s failed test"%source
-                result = 2
+                result = 3
             else:
                 print "%s passed"%source
         else:

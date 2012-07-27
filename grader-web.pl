@@ -57,7 +57,7 @@ use MIME::Base64;
 use File::Copy;
 
 # define problem number
-my $problem = 1;
+my $problem = 0;
 
 my $basedir = "/opt/crashandcompile";
 my $timelimit = 60 * 60 * 3; # 3 hours
@@ -215,11 +215,11 @@ sub results() {
          h1({-align=>'center'},"Results");
 
    # get submissions
-   my $rows = $dbh->selectall_arrayref('select time, problem, result from submissions where userid = ?',
+   my $rows = $dbh->selectall_arrayref('select time, problem, result, note from submissions where userid = ?',
 	undef, $user);
 
    print start_table;
-   print Tr(td(["Time", "Problem", "Result"]));
+   print Tr(td(["Time", "Problem", "Result", "Notes"]));
    for my $row (@$rows) {
       $row->[0] = localtime($row->[0]);
       if( $row->[2] == 0 ) {
@@ -323,10 +323,10 @@ if( param('Login') ) {
 }
 
 if( $session ) {
-   # if time is expired, show the sample problem
-   if( not check_timeslot() ) {
-      $problem = 0;
-   }
+#   # if time is expired, show the sample problem
+#   if( not check_timeslot() ) {
+#      $problem = 0;
+#   }
 
    # receive uploaded file
    my $upload_fh = upload('file');
