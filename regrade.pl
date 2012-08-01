@@ -18,7 +18,7 @@ my $dbh = DBI->connect("DBI:mysql:crashncompile", "crashncompile",
       "crashncompile") or die "Can't connect to database: $DBH::errstr";
 
 my $basedir = "/opt/crashandcompile";
-my $grader = "/home/ubuntu/cnc_2012/grader/grade.py";
+my $grader = "/home/turtlebot/cnc_2012/grader/grade2.py";
 
 chdir("$basedir/tmp");
 
@@ -79,7 +79,10 @@ for my $user (keys %users) {
                my $out = `$cmd`;
                my $res = $?;
                if( not $res ) {
+                  print "Pass $res\n";
                   $pass++;
+               } else {
+                  print "Fail $res\n";
                }
                print "$out";
             } else {
