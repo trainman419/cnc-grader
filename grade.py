@@ -31,11 +31,16 @@ def try_compile(source):
 
     elif extension == "java":
         comp = "cp %s . ; javac %s.java" % (source, basename)
-        executable = "java %s" % basename
+        executable = "/usr/bin/java %s" % basename
         output = "%s.class" % basename
 
     elif extension == "frink":
-        executable = "/home/turtlebot/cnc_2012/grader/frink %s" % source
+        executable = "/bin/bash /home/turtlebot/cnc_2012/grader/frink %s" % source
+
+    elif extension == "hs":
+        comp = "ghc -o %s %s" % (basename, source)
+        executable = "./%s" % basename
+        output = basename
 
     else:
         # assume interpreted
@@ -66,12 +71,12 @@ def main(source, input_file, output_file=None):
 
     # Run the test program
     exec_cmd = subprocess.Popen(executable, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
+                                stderr=subprocess.PIPE, shell=True,
                                 stdin=open(input_file))
     # 60-second time limit
     ret = exec_cmd.poll()
     i = 0
-    while i < 6 and ret == None:
+    while i < 45 and ret == None:
         i += 1
         ret = exec_cmd.poll()
         time.sleep(1)
@@ -95,7 +100,7 @@ def main(source, input_file, output_file=None):
     else:
         if output_file:
             (out, err) = exec_cmd.communicate()
-            diff_cmd = subprocess.Popen("diff -Bb - %s"%output_file,
+            diff_cmd = subprocess.Popen("diff -wBb - %s"%output_file,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                     stdin=subprocess.PIPE, shell=True)
             (diff_out, diff_err) = diff_cmd.communicate(out)
