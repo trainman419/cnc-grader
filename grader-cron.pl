@@ -30,6 +30,7 @@ for my $user (keys %users) {
    closedir DIR;
 
    my $email = "";
+   my $message = "";
 
    for my $file (@files) {
       if( not $file =~ m/^\./ ) {
@@ -91,7 +92,7 @@ for my $user (keys %users) {
                $dbh->do('update submissions set result = 2 where id = ?',
                      undef, $id);
             }
-            my $message = "Passed $pass of $total";
+            $message = "Passed $pass of $total";
             $error and $message = $error;
             $dbh->do('update submissions set note = ? where id = ?',
                      undef, ($message, $id));
@@ -111,6 +112,16 @@ for my $user (keys %users) {
    if( $email ne "" ) {
       print "Sending email to $users{$user}:\n";
       print $email;
+      if( -w "/dev/ttyACM0" ) {
+         print "Sending email to printer\n";
+         open LP, ">/dev/ttyACM0";
+         print LP "$users{$user}\n";
+         sleep(1);
+         print LP "$message\n";
+         sleep(1);
+         print LP "fire!\n";
+         close LP;
+      }
 #      open EMAIL, "|/usr/sbin/sendmail -t -f 'hendrix\@namniart.com'";
 #      print EMAIL "To: $users{$user}\n";
 #      print EMAIL "From: Crash and Compile Grader <hendrix\@namniart.com>\n";
