@@ -44,8 +44,6 @@
 #
 # TODO:
 #  standings page
-#  password change page
-#  links on landing page
 #
 
 use strict;
@@ -128,10 +126,9 @@ sub landing() {
          start_html("Crash and Compile"),
          h1({-align=>'center'}, "Crash and Compile"),
          CGI::start_ul(),
-         li(a({href=>"$url?problem="},"Problem description")),
-         li(a({href=>"$url?upload="}, "Upload source")),
+         li(a({href=>"$url?upload="},"Problem")),
          li(a({href=>"$url?results="},"View results")),
-         li("View standings"),
+         li(a({href=>"$url?standings="}, "View standings")),
          li(a({href=>"$url?passwd="},"Change password")),
          li(
             start_form,
@@ -139,26 +136,26 @@ sub landing() {
             end_form
            );
 
-   if( defined $start ) {
-      my $remain = ($start + $timelimit) - time();
-      if( $remain > 0 ) {
-         my $hours = int($remain / 3600);
-         my $minutes = int(($remain % 3600) / 60);
-         my $seconds = int(($remain % 60 ));
-         print li(sprintf("%d:%02d:%02d remaining\n",$hours,$minutes,$seconds));
-      } else {
-         print li("Time limit expired");
-      }
-   } else {
-      my $row = $dbh->selectrow_arrayref('select count(*) from submissions where result = 1 and problem = 0 and userid = ?', undef, $user);
-      if( $row->[0] > 0 ) {
-         print li(
-                  start_form,
-                  submit(-name=>'Start', -value=>'Start Qualification'),
-                  end_form
-               );
-      }
-   }
+#   if( defined $start ) {
+#      my $remain = ($start + $timelimit) - time();
+#      if( $remain > 0 ) {
+#         my $hours = int($remain / 3600);
+#         my $minutes = int(($remain % 3600) / 60);
+#         my $seconds = int(($remain % 60 ));
+#         print li(sprintf("%d:%02d:%02d remaining\n",$hours,$minutes,$seconds));
+#      } else {
+#         print li("Time limit expired");
+#      }
+#   } else {
+#      my $row = $dbh->selectrow_arrayref('select count(*) from submissions where result = 1 and problem = 0 and userid = ?', undef, $user);
+#      if( $row->[0] > 0 ) {
+#         print li(
+#                  start_form,
+#                  submit(-name=>'Start', -value=>'Start Qualification'),
+#                  end_form
+#               );
+#      }
+#   }
 
    print CGI::end_ul(),
          p($debug),
@@ -233,6 +230,78 @@ sub results() {
       }
       print Tr(td($row));
    }
+   print end_table;
+
+   print p($debug),
+         div({-align=>'center'}, a({href=>url}, "Home")),
+         end_html;
+}
+
+sub standings() {
+   print header(-cookie=>$cookie),
+         start_html("Standings"),
+         h1({-align=>'center'},"Standings");
+
+   my $completed = $dbh->selectall_arrayref('select problem, userid from submissions where result = 1 group by problem, userid order by time');
+
+   my %points;
+   my %problem_remain;
+
+   my $submitted = $dbh->selectall_arrayref('select problem from submissions group by problem');
+   for my $sub (@$submitted) {
+      $problem_remain{$sub->[0]} = 3;
+   }
+
+   for my $result (@$completed) {
+      my $problem = $result->[0];
+      my $user = $result->[1];
+      defined $problem_remain{$problem} or $problem_remain{$problem} = 3;
+      defined $points{$user} or $points{$user} = 0;
+      my $p = $problem_remain{$problem};
+      if( $p > 0 ) {
+         $points{$user} += $p;
+      }
+      $problem_remain{$problem}--;
+   }
+
+   # give remaining points to team distraction
+   $points{100} = 0;
+   for my $remain (keys %problem_remain) {
+      my $p = $problem_remain{$remain};
+      while( $p > 0 ) {
+         $points{100} += $p;
+         $p--;
+      }
+   }
+
+   my %teams;
+
+   my $team_rows = $dbh->selectall_arrayref('select id, email from users');
+
+   for my $t (@$team_rows) {
+      $teams{$t->[0]} = $t->[1];
+      defined $points{$t->[0]} or $points{$t->[0]} = 0;
+   }
+
+   my %leaders;
+
+   for my $team (keys %points) {
+      my $p = $points{$team};
+      defined $leaders{$p} or $leaders{$p} = [];
+      push @{$leaders{$p}}, $team;
+   }
+
+   $teams{100} = "<i>Team Distraction</i>";
+
+   print start_table({-cellpadding=>6, -align=>'center'}),
+         Tr(td([b('Team'), b('Points')]));
+
+   for my $points (reverse sort {$a <=> $b} keys %leaders) {
+      for my $team (@{$leaders{$points}}) {
+         print Tr(td({-align=>'left'}, $teams{$team}). td({-align=>'right'},$points));
+      }
+   }
+
    print end_table;
 
    print p($debug),
@@ -397,6 +466,8 @@ if( not defined $session or $session eq '') {
    upload_page();
 } elsif( defined param('results') ) {
    results();
+} elsif( defined param('standings') ) {
+   standings();
 } elsif( defined param('passwd') ) {
    passwd();
 } else {
