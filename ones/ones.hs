@@ -1,4 +1,4 @@
-
+-- Many thanks to Erin Dahlgren for this haskell implementation of Ones.
 -- ones.hs
 
 import System.Environment
