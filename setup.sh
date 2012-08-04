@@ -16,7 +16,7 @@ then
    echo "Copy files to grader"
    cp -r $local $prefix/grader/
 else
-   push $prefix/grader
+   pushd $prefix/grader
    git clone https://github.com/trainman419/cnc-grader.git
 fi
 
