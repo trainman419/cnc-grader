@@ -1,7 +1,6 @@
 TODO:
- - Finish web interface:
-  - standings page
  - grader.py
   - execution timeout: 1 minute
  - handle submissions with spaces
  - detect bad shebangs and report separately
+ - rewrite in ruby
