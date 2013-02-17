@@ -1,0 +1,27 @@
+<div id="title"><h1>Crash and Compile Grader</h1></div>
+
+<div id="content">
+  <div id="scoreboard">
+    <h2>Scoreboard</h2>
+    <ol>
+      <% @scoreboard.each do |team| %>
+        <li>
+        <span class="teamname"><%= team[:name] %></span>
+        <span class="score"><%= team[:score] %></span>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+  <div id="submissions">
+    <h2>Submissions</h2>
+    <ol>
+      <% @submissions.each do |submission| %>
+        <li>
+        <span class="submission_name"><%= submission[:name] %></span>
+        <span class="<%= submission[:pass]?'score-pass':'score-fail'%>">
+          <%= submission[:pass]?'Pass':'Fail' %></span>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+</div>

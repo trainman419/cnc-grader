@@ -1,0 +1,34 @@
+Ruby/Sinatra web grader design notes:
+
+Use existing DB schema: ../grader.sql
+DB type: mysql
+
+
+Actions:
+
+ * login
+ * View/upload problem
+ * view submission results
+ * view standings
+ * Modify user info:
+  * change password
+  * change email
+  * change user name
+ * Teaming:
+  * Group users into teams
+  * Change team name
+ * log out
+
+Routing:
+
+/ 
+ - login page if not logged in
+ - landing page if logged in
+
+Landing page:
+ - results
+ - standings
+ - tabs:
+  - Link to modify user
+  - Link to modify team
+  - Link to problem

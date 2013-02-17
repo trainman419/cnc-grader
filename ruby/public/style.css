@@ -1,0 +1,72 @@
+#scoreboard,#submissions {
+  width: 40%;
+  margin-right: 5%;
+  margin-left: 5%;
+  background-color: #E0E0E0;
+}
+
+#scoreboard li,#submissions li {
+  margin: 10px;
+  padding: 5px;
+}
+
+#scoreboard {
+  float: left;
+}
+
+#submissions {
+  float: right;
+}
+
+#content {
+  overflow: hidden;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+ul.navigation li {
+  height: 20px;
+  width: 24%;
+  text-align: center;
+  display: inline-block;
+}
+
+ul.navigation {
+  overflow: hidden;
+  background-color: #E0E0E0;
+}
+
+span.teamname {
+  font-weight: bold;
+}
+
+span.submission_name {
+  font-weight: bold;
+}
+
+span.score {
+  float: right;
+}
+
+span.score-pass {
+  float: right;
+  color: green;
+}
+
+span.score-fail {
+  float: right;
+  color: red;
+}
+
+pre {
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 5px;
+  background-color: #EEE;
+}
