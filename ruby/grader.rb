@@ -10,11 +10,13 @@ DataMapper::setup(:default, 'sqlite:///Users/hendrix/cnc.db')
 
 class User
   include DataMapper::Resource
+  include BCrypt
 
   property :id,         Serial
   property :name,       String, :unique => true
   property :email,      String, :unique => true, :format => :email_address
-  property :pw_hash,    String
+  # TODO: examine teh BCryptHash datamapper type instead of String
+  property :pw_hash,    String, :length => 60
 
   belongs_to :team, :required => false
   has n, :submission
@@ -152,6 +154,10 @@ post '/signup' do
       redirect to('/')
     else
       @error = "Error creating user"
+      @user.errors.each do |err|
+        @error += "; "
+        @error += err.join("; ")
+      end
       erb :signup
     end
   end
