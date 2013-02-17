@@ -1,6 +1,52 @@
 require 'sinatra'
+require 'data_mapper'
 
 enable :sessions
+
+DataMapper::Logger.new($stdout, :debug)
+
+DataMapper::setup(:default, 'sqlite:///Users/hendrix/cnc.db')
+
+class User
+  include DataMapper::Resource
+
+  property :id,         Serial
+  property :name,       String, :unique => true
+  property :email,      String, :unique => true, :format => :email_address
+  property :pw_hash,    String
+
+  belongs_to :team
+  has n, :submission
+
+  validates_length_of :name, :min => 1
+  validates_length_of :email, :min => 1
+end
+
+class Submission
+  include DataMapper::Resource
+
+  property :id,         Serial
+  property :time,       DateTime
+  property :filename,   String
+  property :result,     String
+  property :note,       Text
+
+  belongs_to :user
+end
+
+class Team
+  include DataMapper::Resource
+
+  property :id,         Serial
+  property :name,       String, :unique => true
+
+  has n, :user
+
+  validates_length_of :name, :min => 1
+end
+
+DataMapper.finalize
+DataMapper.auto_upgrade!
 
 get '/' do
   if session['user_id']
@@ -40,6 +86,7 @@ end
 get '/settings' do
   if not session['user_id']
     # TODO: redirect to landing page
+    redirect to('/login')
   end
 
   @username = session['username']
@@ -50,6 +97,83 @@ get '/login' do
   erb :login
 end
 
+post '/login' do
+  # TODO
+  redirect to('/')
+end
+
 get '/logout' do
   # TODO
+end
+
+get '/signup' do
+  # TODO
+  erb :signup
+end
+
+post '/signup' do
+  @user = User.new(:name => params['name'],
+                  :email => params['email'])
+
+  error = ! @user.valid?
+
+  if ! params['password'] or params['password'].length == 0
+    error = true
+    @user.errors.add(:password, "Password must not be blank")
+  elsif ! params['password_confirm'] or params['password_confirm'].length == 0
+    error = true
+    @user.errors.add(:password_confirm, "Password must not be blank")
+  elsif params['password'] != params['password_confirm']
+    error = true
+    @user.errors.add(:password_confirm, "Passwords must match")
+  end
+
+  if error
+    erb :signup
+  else
+    session['user_id'] = user.id
+    redirect to('/')
+  end
+end
+
+class Form
+  def initialize(obj)
+    @obj = obj
+  end
+
+  def input(field, options={})
+    options = { :type => "text", :label => "" }.merge(options)
+    type = options[:type]
+    label = options[:label]
+
+    val = ""
+    if @obj
+      val = @obj[field]
+    end
+
+    html = <<EOF
+<div class="input_row">
+<label for="#{field}">#{label}</label>
+<input type="#{type}" name="#{field}" value="#{val}"/>
+EOF
+    if @obj and @obj.errors[field] and @obj.errors[field].length > 0
+      err = @obj.errors[field].join("; ")
+      html += <<EOF
+<div class="error">#{err}</div>
+EOF
+    end
+    html += "</div>"
+    html
+  end
+
+  def submit(options={})
+    opts = { :label => "Submit" }.merge(options)
+    "<input type=\"submit\" value=\"#{opts[:label]}\"/>"
+  end
+end
+
+helpers do
+  def form_for(obj, &block)
+    block.call(Form.new(obj))
+  end
 end

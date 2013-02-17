@@ -1,0 +1,17 @@
+<h1 align="center">Crash and Compile Grader</h1>
+<h2 align="center">Sign Up</h2>
+
+<form method="post" action="/signup" enctype="multipart/form-data">
+
+<% form_for @user do |f| %>
+
+  <%= f.input :name, :label => "Username" %>
+  <%= f.input :email, :label => "Email" %>
+  <%= f.input :password, :type => :password, :label => "Password" %>
+  <%= f.input :password_confirm, :type => :password,
+    :label => "Password (confirm)" %>
+  <%= f.submit :label => "Sign Up" %>
+
+<% end %>
+
+</form>
