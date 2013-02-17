@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'data_mapper'
+require 'bcrypt'
 
 enable :sessions
 
@@ -15,11 +16,20 @@ class User
   property :email,      String, :unique => true, :format => :email_address
   property :pw_hash,    String
 
-  belongs_to :team
+  belongs_to :team, :required => false
   has n, :submission
 
   validates_length_of :name, :min => 1
   validates_length_of :email, :min => 1
+
+  def password
+    @password ||= Password.new(@pw_hash)
+  end
+
+  def password=(new_pw)
+    @password = Password.create(new_pw)
+    @pw_hash = @password
+  end
 end
 
 class Submission
@@ -129,10 +139,21 @@ post '/signup' do
   end
 
   if error
+    @error = "Please correct the following problems"
+#    @user.errors.each do |err|
+#      @error += "; "
+#      @error += err.join("; ")
+#    end
     erb :signup
   else
-    session['user_id'] = user.id
-    redirect to('/')
+    @user.password = params['password']
+    if @user.save
+      session['user_id'] = @user.id
+      redirect to('/')
+    else
+      @error = "Error creating user"
+      erb :signup
+    end
   end
 end
 

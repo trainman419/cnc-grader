@@ -1,5 +1,10 @@
-<h1 align="center">Crash and Compile Grader</h1>
-<h2 align="center">Sign Up</h2>
+<h1>Crash and Compile Grader</h1>
+<h2>Sign Up</h2>
+
+<% if @error %>
+  <h3 class="error"><%= @error %></h3>
+<% end %>
+
 
 <form method="post" action="/signup" enctype="multipart/form-data">
 
