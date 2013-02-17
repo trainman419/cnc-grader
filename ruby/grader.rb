@@ -15,23 +15,13 @@ class User
   property :id,         Serial
   property :name,       String, :unique => true
   property :email,      String, :unique => true, :format => :email_address
-  # TODO: examine teh BCryptHash datamapper type instead of String
-  property :pw_hash,    String, :length => 60
+  property :pw_hash,    BCryptHash
 
   belongs_to :team, :required => false
   has n, :submission
 
   validates_length_of :name, :min => 1
   validates_length_of :email, :min => 1
-
-  def password
-    @password ||= Password.new(@pw_hash)
-  end
-
-  def password=(new_pw)
-    @password = Password.create(new_pw)
-    @pw_hash = @password
-  end
 end
 
 class Submission
@@ -97,10 +87,10 @@ end
 
 get '/settings' do
   if not session['user_id']
-    # TODO: redirect to landing page
     redirect to('/login')
   end
 
+  # TODO
   @username = session['username']
   @teamname = session['teamname']
 end
@@ -110,16 +100,25 @@ get '/login' do
 end
 
 post '/login' do
-  # TODO
-  redirect to('/')
+  @login = { :name => params['name'], :pass => params['pass'] }
+  if params['name'] and params['pass']
+    user = User.first(:name => params['name'])
+    if user and user.pw_hash == params['pass']
+      session['user_id'] = user.id
+      redirect to('/')
+    else
+      @error = "Bad username or password"
+    end
+  end
+  erb :login
 end
 
 get '/logout' do
-  # TODO
+  session.clear
+  redirect '/'
 end
 
 get '/signup' do
-  # TODO
   erb :signup
 end
 
@@ -142,13 +141,9 @@ post '/signup' do
 
   if error
     @error = "Please correct the following problems"
-#    @user.errors.each do |err|
-#      @error += "; "
-#      @error += err.join("; ")
-#    end
     erb :signup
   else
-    @user.password = params['password']
+    @user.pw_hash = params['password']
     if @user.save
       session['user_id'] = @user.id
       redirect to('/')
@@ -183,7 +178,8 @@ class Form
 <label for="#{field}">#{label}</label>
 <input type="#{type}" name="#{field}" value="#{val}"/>
 EOF
-    if @obj and @obj.errors[field] and @obj.errors[field].length > 0
+    if @obj and @obj.respond_to?(:errors) and @obj.errors[field] and
+      @obj.errors[field].length > 0
       err = @obj.errors[field].join("; ")
       html += <<EOF
 <div class="error">#{err}</div>
@@ -195,7 +191,11 @@ EOF
 
   def submit(options={})
     opts = { :label => "Submit" }.merge(options)
-    "<input type=\"submit\" value=\"#{opts[:label]}\"/>"
+    <<EOF
+<div class="input_row">
+<input type="submit" value="#{opts[:label]}"/>
+</div>
+EOF
   end
 end
 
