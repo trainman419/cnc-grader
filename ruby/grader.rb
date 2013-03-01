@@ -2,74 +2,34 @@ require 'sinatra'
 require 'data_mapper'
 require 'bcrypt'
 
+require "./datamap"
+require "./config"
+
 enable :sessions
 
-DataMapper::Logger.new($stdout, :debug)
-
-DataMapper::setup(:default, 'sqlite:///Users/hendrix/cnc.db')
-
-class User
-  include DataMapper::Resource
-  include BCrypt
-
-  property :id,         Serial
-  property :name,       String, :unique => true
-  property :email,      String, :unique => true, :format => :email_address
-  property :pw_hash,    BCryptHash
-
-  belongs_to :team, :required => false
-  has n, :submission
-
-  validates_length_of :name, :min => 1
-  validates_length_of :email, :min => 1
-end
-
-class Submission
-  include DataMapper::Resource
-
-  property :id,         Serial
-  property :time,       DateTime
-  property :filename,   String
-  property :result,     String
-  property :note,       Text
-
-  belongs_to :user
-end
-
-class Team
-  include DataMapper::Resource
-
-  property :id,         Serial
-  property :name,       String, :unique => true
-
-  has n, :user
-
-  validates_length_of :name, :min => 1
-end
-
-DataMapper.finalize
 DataMapper.auto_upgrade!
 
 get '/' do
   if session['user_id']
     @logged_in = true
 
-    # TODO: pull this user's submissions from DB
     # Submission name format: Problem Name + File Name
-    @submissions = []
-    @submissions.push({ :name => 'Submission A', :pass => false })
-    @submissions.push({ :name => 'Submission B', :pass => true })
+    # TODO: enforce display format
+    @submissions = Submission.all(:user => session['user_id'],
+                                 :order => [ :time.desc ])
+    #@submissions.push({ :name => 'Submission A', :pass => false })
+    #@submissions.push({ :name => 'Submission B', :pass => true })
   else
-    # TODO: pull all user's submissions from a DB
     # Submission name format: Team Name + Problem Name
-    @submissions = []
-    @submissions.push({ :name => 'Submission A', :pass => false })
-    @submissions.push({ :name => 'Submission B', :pass => true })
+    # TODO: enforce display format
+    @submissions = Submission.all(:order => [ :time.desc ])
+    #@submissions.push({ :name => 'Submission A', :pass => false })
+    #@submissions.push({ :name => 'Submission B', :pass => true })
   end
 
-  # TODO: pull scoreboard data from DB
-  @scoreboard = []
-  @scoreboard.push({ :name => 'Team A', :score => 5 })
+  # pull scoreboard data from DB
+  @scoreboard = Team.all(:order => [ :score.desc ])
+  #@scoreboard.push({ :name => 'Test Team', :score => 5 })
 
   erb :landing
 end
@@ -86,13 +46,22 @@ get '/problem' do
 end
 
 get '/settings' do
-  if not session['user_id']
+  if session['user_id']
+    @logged_in = true
+  else
     redirect to('/login')
   end
 
   # TODO
+  #  - team creation
+  #  - request to join a team
+  #  - email change
+  #  - username change
+  #  - password change
   @username = session['username']
   @teamname = session['teamname']
+
+  erb :settings
 end
 
 get '/login' do

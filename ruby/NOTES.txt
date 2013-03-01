@@ -32,3 +32,14 @@ Landing page:
   - Link to modify user
   - Link to modify team
   - Link to problem
+
+TODO:
+ - settings page
+ - problem submissions
+ - submission results
+ - standings
+ - team management
+ - Rules and general specifications page
+  - stdio, time limit, etc
+  - acceptable languages
+  - #! syntax
