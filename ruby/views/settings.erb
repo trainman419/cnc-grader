@@ -1,0 +1,10 @@
+<ul>
+  <li>Username: <%= @user.name %></li>
+  <li>Email: <%= @user.email %></li>
+  <li>ID: <%= @user.id %></li>
+  <% if @user.team %>
+    <li>Team Name: <%= @user.team.name %></li>
+  <% else %>
+    <li>Sorry, you are not on a team yet</li>
+  <% end %>
+</ul>

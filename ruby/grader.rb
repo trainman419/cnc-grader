@@ -47,21 +47,18 @@ end
 
 get '/settings' do
   if session['user_id']
-    @logged_in = true
-  else
-    redirect to('/login')
+    # TODO
+    #  - team creation
+    #  - request to join a team
+    #  - email change
+    #  - username change
+    #  - password change
+    @user = User.get(session['user_id'])
+    if @user
+      return erb :settings
+    end
   end
-
-  # TODO
-  #  - team creation
-  #  - request to join a team
-  #  - email change
-  #  - username change
-  #  - password change
-  @username = session['username']
-  @teamname = session['teamname']
-
-  erb :settings
+  redirect to('/login')
 end
 
 get '/login' do
