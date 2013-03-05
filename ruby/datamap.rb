@@ -1,7 +1,8 @@
+require "./config"
 
 DataMapper::Logger.new($stdout, :debug)
 
-DataMapper::setup(:default, 'sqlite:///Users/hendrix/cnc.db')
+DataMapper::setup(:default, db_path)
 
 class User
   include DataMapper::Resource
