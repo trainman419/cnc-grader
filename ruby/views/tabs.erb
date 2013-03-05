@@ -1,11 +1,13 @@
-<ul class="navigation">
-  <li><a href="/">Scores</a></li>
-  <li><a href="/problem">Problem</a></li>
-  <% if @logged_in %>
-    <li><a href="/settings">Settings</a></li>
-    <li><a href="/logout">Logout</a></li>
-  <% else %>
-    <li><a href="/signup">Sign Up</a></li>
-    <li><a href="/login">Log In</a></li>
-  <% end %>
-</ul>
+<nav>
+  <ul>
+    <li><a href="/">Scores</a></li>
+    <li><a href="/problem">Problem</a></li>
+    <% if @logged_in %>
+      <li><a href="/settings">Settings</a></li>
+      <li><a href="/logout">Logout</a></li>
+    <% else %>
+      <li><a href="/signup">Sign Up</a></li>
+      <li><a href="/login">Log In</a></li>
+    <% end %>
+  </ul>
+</nav>

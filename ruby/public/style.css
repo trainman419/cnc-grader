@@ -28,6 +28,8 @@
 
 body {
   font-family: sans-serif;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 h1 {
@@ -38,17 +40,24 @@ h2 {
   text-align: center;
 }
 
-ul.navigation li {
+nav li {
   height: 20px;
-  width: 24%;
+  width: 23%;
+  padding: 0.8%;
+  border: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
   text-align: center;
   display: inline-block;
   text-decoration: none;
 }
 
-ul.navigation {
+nav ul {
   overflow: hidden;
   background-color: #E0E0E0;
+  padding: 0px;
+  border: 0px;
+  margin: 0px;
 }
 
 span.teamname {
