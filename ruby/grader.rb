@@ -53,6 +53,7 @@ get '/settings' do
     #  - email change
     #  - username change
     #  - password change
+    @logged_in = true
     @user = User.get(session['user_id'])
     if @user
       return erb :settings
