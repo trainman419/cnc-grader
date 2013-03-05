@@ -2,7 +2,7 @@ require "./config"
 
 DataMapper::Logger.new($stdout, :debug)
 
-DataMapper::setup(:default, db_path)
+DataMapper::setup(:default, $db_path)
 
 class User
   include DataMapper::Resource
