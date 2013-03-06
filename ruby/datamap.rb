@@ -1,6 +1,6 @@
 require "./config"
 
-DataMapper::Logger.new($stdout, :debug)
+#DataMapper::Logger.new($stdout, :debug)
 
 DataMapper::setup(:default, $db_path)
 
@@ -48,7 +48,7 @@ class Team
 
   property :id,         Serial
   property :name,       String, :unique => true
-  property :score,      Integer
+  property :score,      Integer, :default => 0
 
   has n, :user
 

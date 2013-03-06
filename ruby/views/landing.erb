@@ -12,8 +12,8 @@
       <% end %>
     </ol>
   </div>
-  <% if @user_submissions %>
-    <div id="user_submissions">
+  <div id="submissions">
+    <% if @user_submissions %>
       <h2>Your Submissions</h2>
       <ol>
         <% @user_submissions.each do |submission| %>
@@ -26,20 +26,25 @@
             <span class="score-pass">Pass</span>
           <% when 2 %>
             <span class="score-fail">Fail</span>
+          <% when 3 %>
+            <span class="score-pending">Skipped</span>
           <% else %>
             <span class="score-fail">Grader Error</span>
           <% end %>
           </li>
         <% end %>
       </ol>
-    </div>
-  <% end %>
-  <div id="submissions">
+    <% end %>
     <h2>All Submissions</h2>
     <ol>
       <% @submissions.each do |submission| %>
         <li>
-        <span class="submission_name"><%= submission.user.name %>:
+        <span class="submission_name">
+          <% if submission.user.team %>
+            <%= submission.user.team.name %>:
+          <% else %>
+            <%= submission.user.name %>:
+          <% end %>
           <%= submission.problem.name %></span>
         <% case submission.result ; when 0 %>
           <span class="score-pending">Pending</span>
@@ -47,6 +52,8 @@
           <span class="score-pass">Pass</span>
         <% when 2 %>
           <span class="score-fail">Fail</span>
+        <% when 3 %>
+          <span class="score-pending">Skipped</span>
         <% else %>
           <span class="score-fail">Grader Error</span>
         <% end %>
