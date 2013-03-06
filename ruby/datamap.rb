@@ -20,16 +20,27 @@ class User
   validates_length_of :email, :min => 1
 end
 
+class Problem
+  include DataMapper::Resource
+
+  property :id,         Serial
+  property :name,       String
+  property :path,       String
+  has n, :submission
+end
+
 class Submission
   include DataMapper::Resource
 
   property :id,         Serial
   property :time,       DateTime
-  property :filename,   String
-  property :result,     String
+  property :filename,   String, :length => 250
+  property :archive,    String, :length => 250
+  property :result,     Integer, :default => 0
   property :note,       Text
 
   belongs_to :user
+  belongs_to :problem
 end
 
 class Team

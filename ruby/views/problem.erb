@@ -1,1 +1,17 @@
-<%= erb :"problems/#{@problem}" %>
+<div id="problem">
+  <%= erb :"problems/#{@problem.path}" %>
+</div>
+
+<div id="upload">
+  <% if @logged_in %>
+    <form method="post" action="/problem" enctype="multipart/form-data">
+      <label for="file">Upload Solution: </label><input type="file" name="file"  />
+      <input type="submit" name="Upload" value="Upload" />
+    </form>
+  <% end %>
+
+  <% if @error %>
+    <div class="error"><%= @error %></div>
+  <% end %>
+
+</div>

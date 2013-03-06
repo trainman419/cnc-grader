@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'data_mapper'
 require 'bcrypt'
+require 'time'
+require 'fileutils'
 
 require "./datamap"
 require "./config"
@@ -15,17 +17,13 @@ get '/' do
 
     # Submission name format: Problem Name + File Name
     # TODO: enforce display format
-    @submissions = Submission.all(:user => session['user_id'],
+    @user_submissions = Submission.all(Submission.user.id => session['user_id'],
                                  :order => [ :time.desc ])
-    #@submissions.push({ :name => 'Submission A', :pass => false })
-    #@submissions.push({ :name => 'Submission B', :pass => true })
-  else
-    # Submission name format: Team Name + Problem Name
-    # TODO: enforce display format
-    @submissions = Submission.all(:order => [ :time.desc ])
-    #@submissions.push({ :name => 'Submission A', :pass => false })
-    #@submissions.push({ :name => 'Submission B', :pass => true })
   end
+
+  # Submission name format: Team Name + Problem Name
+  # TODO: enforce display format
+  @submissions = Submission.all(:order => [ :time.desc ])
 
   # pull scoreboard data from DB
   @scoreboard = Team.all(:order => [ :score.desc ])
@@ -40,9 +38,53 @@ get '/problem' do
   end
 
   # TODO: pull current problem name from DB
-  @problem = "ones"
+  @problem = Problem.first(:name => "Ones")
 
   erb :problem
+end
+
+post '/problem' do
+  # TODO: pull current problem name from DB
+  @problem = Problem.first(:name => "Ones")
+  if session['user_id']
+    @logged_in = true
+    user = User.get(session['user_id'])
+    now = Time.now()
+
+    # Create upload directories
+    user_dir = File.join($upload_dir, user.id.to_s())
+    user_archive_dir = File.join($upload_dir, 'archive', user.id.to_s())
+    FileUtils.mkdir_p([user_dir, user_archive_dir])
+
+    # Grader input file
+    filename = File.join(user_dir, params['file'][:filename])
+    File.open(filename, "w") do |f|
+      f.write(params['file'][:tempfile].read)
+    end
+
+    # Archive file
+    archive = File.join(user_archive_dir, now.to_s() + '-' + params['file'][:filename])
+    File.open(archive, "w") do |f|
+      f.write(params['file'][:tempfile].read)
+    end
+
+    # Create database entry
+    s = Submission.new(:time => now, 
+                   :filename => params['file'][:filename],
+                   :archive => archive,
+                   :problem => @problem,
+                   :user => user)
+
+    if not s.save
+      @error = "Failed to save Submission: " + s.errors.join(', ')
+    end
+
+    erb :problem 
+  else
+    # if the user isn't logged in, throw away their upload and send them to
+    # the login page
+    redirect to('/login')
+  end
 end
 
 get '/settings' do

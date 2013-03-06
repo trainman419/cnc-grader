@@ -12,14 +12,44 @@
       <% end %>
     </ol>
   </div>
+  <% if @user_submissions %>
+    <div id="user_submissions">
+      <h2>Your Submissions</h2>
+      <ol>
+        <% @user_submissions.each do |submission| %>
+          <li>
+          <span class="submission_name"><%= submission.problem.name %>:
+            <%= submission.filename %></span>
+          <% case submission.result ; when 0 %>
+            <span class="score-pending">Pending</span>
+          <% when 1 %>
+            <span class="score-pass">Pass</span>
+          <% when 2 %>
+            <span class="score-fail">Fail</span>
+          <% else %>
+            <span class="score-fail">Grader Error</span>
+          <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  <% end %>
   <div id="submissions">
-    <h2>Submissions</h2>
+    <h2>All Submissions</h2>
     <ol>
       <% @submissions.each do |submission| %>
         <li>
-        <span class="submission_name"><%= submission[:name] %></span>
-        <span class="<%= submission[:pass]?'score-pass':'score-fail'%>">
-          <%= submission[:pass]?'Pass':'Fail' %></span>
+        <span class="submission_name"><%= submission.user.name %>:
+          <%= submission.problem.name %></span>
+        <% case submission.result ; when 0 %>
+          <span class="score-pending">Pending</span>
+        <% when 1 %>
+          <span class="score-pass">Pass</span>
+        <% when 2 %>
+          <span class="score-fail">Fail</span>
+        <% else %>
+          <span class="score-fail">Grader Error</span>
+        <% end %>
         </li>
       <% end %>
     </ol>
