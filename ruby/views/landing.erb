@@ -6,7 +6,7 @@
     <ol>
       <% @scoreboard.each do |team| %>
         <li>
-        <span class="teamname"><%= team[:name] %></span>
+        <span class="teamname"><%= Rack::Utils.escape_html(team[:name]) %></span>
         <span class="score"><%= team[:score] %></span>
         </li>
       <% end %>
@@ -19,7 +19,7 @@
         <% @user_submissions.each do |submission| %>
           <li>
           <span class="submission_name"><%= submission.problem.name %>:
-            <%= submission.filename %></span>
+            <%= Rack::Utils.escape_html(submission.filename) %></span>
           <% case submission.result ; when 0 %>
             <span class="score-pending">Pending</span>
           <% when 1 %>
@@ -42,9 +42,9 @@
         <li>
         <span class="submission_name">
           <% if submission.user.team %>
-            <%= submission.user.team.name %>:
+            <%= Rack::Utils.escape_html(submission.user.team.name) %>:
           <% else %>
-            <%= submission.user.name %>:
+            <%= Rack::Utils.escape_html(submission.user.name) %>:
           <% end %>
           <%= submission.problem.name %></span>
         <% case submission.result ; when 0 %>
