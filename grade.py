@@ -6,6 +6,7 @@ import os
 import subprocess
 import time
 
+debug = True
 
 def try_compile(source):
     """ Accepts source file name, tries to figure out what it is and compile
@@ -107,6 +108,8 @@ def main(source, input_file, output_file=None):
             ret = diff_cmd.wait()
             if ret:
                 print "%s failed test"%source
+                if debug:
+                    print diff_out
                 result = 3
             else:
                 print "%s passed"%source
