@@ -23,14 +23,15 @@
           <% case submission.result ; when 0 %>
             <span class="score-pending">Pending</span>
           <% when 1 %>
-            <span class="score-pass">Pass</span>
+            <span class="score-pass">
           <% when 2 %>
-            <span class="score-fail">Fail</span>
+            <span class="score-fail">
           <% when 3 %>
-            <span class="score-pending">Skipped</span>
+            <span class="score-pending">
           <% else %>
-            <span class="score-fail">Grader Error</span>
+            <span class="score-fail">Grader Error:
           <% end %>
+          <%= submission.note %></span>
           </li>
         <% end %>
       </ol>
