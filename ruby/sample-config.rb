@@ -1,5 +1,5 @@
-$basedir = "/Users/hendrix/crash-n-compile"
-$upload_dir = "/Users/hendrix/crash-n-compile/upload"
-$db_path = "sqlite:///Users/hendrix/cnc.db"
+$basedir = "/opt/crashandcompile"
+$upload_dir = $basedir + "/upload"
+$db_path = "sqlite://#{$basedir}/cnc.db"
 
-$grader = "/Users/hendrix/crash-n-compile/grader/grade.py"
+$grader = "#{$basedir}/grader/grade.py"
