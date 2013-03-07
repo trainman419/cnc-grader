@@ -19,3 +19,48 @@
 <% else %>
    <p>Sorry, no problem is currently active</p>
 <% end %>
+
+<div id="guidelines">
+   <h2>Submission Guidelines</h2>
+
+   <p>All programs should read input on standard input, and produce output on standard output. Your program will be run with its input and output redirected to files, and diff will be used to compare your output with the correct answer.</p>
+
+   <p>A simple program that does this in C would be:</p>
+
+   <pre>
+#include &lt;stdio.h&gt;
+
+int main() {
+   int i;
+   while( scanf("%d", &amp;i) ) {
+      printf("%d\n", i);
+   }
+   return 0;
+}
+   </pre>
+
+   <p>This would then be compiled by the grader:</p>
+
+   <pre>cc sample.c</pre>
+
+   <p>And run with sample inputs (in1.txt) and outputs (out1.txt)</p>
+
+   <p>in1.txt:</p>
+   <pre>
+1
+2
+3
+   </pre>
+
+   <p>out1.txt:</p>
+   <pre>
+1
+2
+3
+   </pre>
+
+   <p>Invocation:</p>
+   <pre>./a.out &lt; in1.txt | diff -wBb - out1.txt</pre>
+
+   <p>The return code from diff is then used to determine if your program has passed or failed.</p>
+</div>
