@@ -2,7 +2,7 @@
 #
 # Generate problem directory from problem descriptions
 
-i=0
+i=1
 #0 => rare_order
 #1 => gears
 #2 => jolly_jumpers

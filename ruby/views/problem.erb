@@ -1,6 +1,6 @@
 <% if @problem %>
    <div id="problem">
-      <%= erb :"problems/#{@problem.path}" %>
+      <%= File.read(File.join($basedir,'problems', @problem.id.to_s, 'problem.html')) %>
    </div>
 
    <div id="upload">
