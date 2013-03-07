@@ -43,6 +43,15 @@ def try_compile(source):
         executable = "./%s" % basename
         output = basename
 
+    elif extension == "py":
+        executable = "python %s" % source
+
+    elif extension == "rb":
+        executable = "ruby %s" % source
+
+    elif extension == "pl":
+        executable = "perl %s" % source
+
     else:
         # assume interpreted
         comp = "chmod u+x %s" % source
