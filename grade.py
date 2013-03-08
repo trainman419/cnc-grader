@@ -52,6 +52,9 @@ def try_compile(source):
     elif extension == "pl":
         executable = "perl %s" % source
 
+    elif extension == "lua":
+        executable = "lua %s" % source
+
     else:
         # assume interpreted
         comp = "chmod u+x %s" % source
