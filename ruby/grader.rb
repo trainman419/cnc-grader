@@ -1,13 +1,5 @@
-require 'sinatra'
-require 'data_mapper'
-require 'bcrypt'
-require 'time'
-require 'fileutils'
-
-require "./datamap"
-require "./config"
-
 enable :sessions
+set :session_secret, (ENV['SESSION_SECRET'] || 'superSecret!1!')
 
 DataMapper.auto_upgrade!
 
@@ -17,8 +9,10 @@ get '/' do
 
     # Submission name format: Problem Name + File Name
     # TODO: enforce display format
-    @user_submissions = Submission.all(Submission.user.id => session['user_id'],
-                                 :order => [ :time.desc ])
+    @user_submissions = Submission.all(
+      Submission.user.id => session['user_id'],
+      :order => [ :time.desc ]
+    )
   end
 
   # Submission name format: Team Name + Problem Name
@@ -27,9 +21,31 @@ get '/' do
 
   # pull scoreboard data from DB
   @scoreboard = Team.all(:order => [ :score.desc ])
+
+  # Test Data
   #@scoreboard.push({ :name => 'Test Team', :score => 5 })
+  #if @user_submissions
+  #  @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 0, :filename => 'test.rb' )
+  #  @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 1, :filename => 'test.rb' )
+  #  @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 2, :filename => 'test.rb' )
+  #  @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 3, :filename => 'test.rb' )
+  #  @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 4, :filename => 'test.rb' )
+  #end
+  #@submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 0 )
+  #@submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 1 )
+  #@submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 2 )
+  #@submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 3 )
+  #@submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 4 )
 
   erb :landing
+end
+
+get '/about' do
+  if session['user_id']
+    @logged_in = true
+  end
+
+  erb :about
 end
 
 get '/problem' do
@@ -69,7 +85,7 @@ post '/problem' do
     end
 
     # Create database entry
-    s = Submission.new(:time => now, 
+    s = Submission.new(:time => now,
                    :filename => params['file'][:filename],
                    :archive => archive,
                    :problem => @problem,
@@ -79,7 +95,7 @@ post '/problem' do
       @error = "Failed to save Submission: " + s.errors.join(', ')
     end
 
-    erb :problem 
+    erb :problem
   else
     # if the user isn't logged in, throw away their upload and send them to
     # the login page
@@ -202,7 +218,7 @@ EOF
     opts = { :label => "Submit" }.merge(options)
     <<EOF
 <div class="input_row">
-<input type="submit" value="#{opts[:label]}"/>
+<input type="submit" value="#{opts[:label]}" class="btn btn-large btn-primary"/>
 </div>
 EOF
   end
