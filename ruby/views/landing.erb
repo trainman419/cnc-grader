@@ -20,7 +20,15 @@
         <h2>Your Submissions</h2>
         <ol>
           <% @user_submissions.each do |submission| %>
-            <li>
+            <li class="alert
+            <% case submission.result; when 1 %>
+              alert-success
+            <% when 2 %>
+              alert-error
+            <% when 3 %>
+              alert-info
+            <% end%>
+            ">
             <span class="submission_name"><%= submission.problem.name %>:
             <%= Rack::Utils.escape_html(submission.filename) %></span>
             <% case submission.result ; when 0 %>
@@ -44,7 +52,15 @@
       <h2>All Submissions</h2>
       <ol>
         <% @submissions.each do |submission| %>
-          <li>
+          <li class="alert
+            <% case submission.result; when 1 %>
+              alert-success
+            <% when 2 %>
+              alert-error
+            <% when 3 %>
+              alert-info
+            <% end%>
+            ">
           <span class="submission_name">
             <% if submission.user.team %>
               <%= Rack::Utils.escape_html(submission.user.team.name) %>:
