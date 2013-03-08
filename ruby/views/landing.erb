@@ -1,7 +1,21 @@
 <div id="content">
 
   <div class="row-fluid">
-    <div class="span6 offset3">
+    <div id="scoreboard" class="span6 offset3">
+      <h2>Scoreboard</h2>
+      <ol>
+        <% @scoreboard.each do |team| %>
+          <li>
+          <span class="teamname"><%= Rack::Utils.escape_html(team[:name]) %></span>
+          <span class="score"><%= team[:score] %></span>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </div>
+
+  <div class="row-fluid submission">
+    <div class="span6">
       <% if @user_submissions %>
         <h2>Your Submissions</h2>
         <ol>
@@ -25,22 +39,8 @@
         </ol>
       <% end %>
     </div>
-  </div>
 
-  <div class="row-fluid">
-    <div id="scoreboard" class="span6">
-      <h2>Scoreboard</h2>
-      <ol>
-        <% @scoreboard.each do |team| %>
-          <li>
-          <span class="teamname"><%= Rack::Utils.escape_html(team[:name]) %></span>
-          <span class="score"><%= team[:score] %></span>
-          </li>
-        <% end %>
-      </ol>
-    </div>
-
-    <div id="submissions" class="span6">
+    <div class="span6">
       <h2>All Submissions</h2>
       <ol>
         <% @submissions.each do |submission| %>
