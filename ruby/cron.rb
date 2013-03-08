@@ -87,6 +87,29 @@ pending.each do |submission|
   if pass == inputs[problem_id].size
     submission.result = 1
     submission.note = "Passed Tests"
+    # grant points
+    if submission.user.team
+       team_count = Submission.count(:result => 1, 
+                                     :problem => submission.problem,
+                                     Submission.user.team.id => submission.user.team.id)
+       puts "Team #{submission.user.team.name} has solved this #{team_count} times"
+       # only give the user points if they haven't already solved the problem
+       if team_count == 0
+         # compute points based on previous correct submissions
+         count = Submission.count(:result => 1,
+                                  :problem => submission.problem)
+         points = 0
+         case count
+         when 0
+            points = 3
+         when 1
+            points = 2
+         when 2
+            points = 1
+         end
+         submission.user.team.score += points
+       end
+    end
   else
     submission.result = 2
     if error and error.length > 0
