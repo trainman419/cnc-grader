@@ -5,8 +5,6 @@ require 'bundler'
 
 Bundler.require(:default)
 
-require 'bcrypt'
-
 require "./datamap"
 require "./config"
 
