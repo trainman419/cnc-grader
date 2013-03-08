@@ -1,2 +1,4 @@
 config.rb
 .DS_Store
+*.db
+upload/
