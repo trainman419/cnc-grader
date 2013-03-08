@@ -3,7 +3,6 @@ enable :sessions
 DataMapper.auto_upgrade!
 
 get '/' do
-  @logged_in = false
   if session['user_id']
     @logged_in = true
 
@@ -24,6 +23,14 @@ get '/' do
   #@scoreboard.push({ :name => 'Test Team', :score => 5 })
 
   erb :landing
+end
+
+get '/about' do
+  if session['user_id']
+    @logged_in = true
+  end
+
+  erb :about
 end
 
 get '/problem' do
