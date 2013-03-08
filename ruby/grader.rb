@@ -196,7 +196,7 @@ EOF
     opts = { :label => "Submit" }.merge(options)
     <<EOF
 <div class="input_row">
-<input type="submit" value="#{opts[:label]}"/>
+<input type="submit" value="#{opts[:label]}" class="btn btn-large btn-primary"/>
 </div>
 EOF
   end
