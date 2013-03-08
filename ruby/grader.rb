@@ -4,6 +4,8 @@ set :session_secret, (ENV['SESSION_SECRET'] || 'superSecret!1!')
 DataMapper.auto_upgrade!
 
 get '/' do
+  SUBMISSION_COUNT = 20
+  
   if session['user_id']
     @logged_in = true
 
@@ -11,13 +13,17 @@ get '/' do
     # TODO: enforce display format
     @user_submissions = Submission.all(
       Submission.user.id => session['user_id'],
-      :order => [ :time.desc ]
+      :order => [ :time.desc ],
+      :limit => SUBMISSION_COUNT,
     )
   end
 
   # Submission name format: Team Name + Problem Name
   # TODO: enforce display format
-  @submissions = Submission.all(:order => [ :time.desc ])
+  @submissions = Submission.all(
+    :order => [ :time.desc ],
+    :limit => SUBMISSION_COUNT,
+  )
 
   # pull scoreboard data from DB
   @scoreboard = Team.all(:order => [ :score.desc ])
