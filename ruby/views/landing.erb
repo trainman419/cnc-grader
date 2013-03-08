@@ -68,11 +68,10 @@
             <% end%>
             ">
           <span class="submission_name">
-            <% if submission.user.team %>
-              <%= Rack::Utils.escape_html(submission.user.team.name) %>:
-            <% else %>
-              <%= Rack::Utils.escape_html(submission.user.name) %>:
-            <% end %>
+           <%= Rack::Utils.escape_html(submission.user.name) %>
+           <% if submission.user.team %>
+              (<%= Rack::Utils.escape_html(submission.user.team.name) %>)
+            <% end %>:
             <%= submission.problem.name %></span>
           <% case submission.result ; when 0 %>
             <span class="score-pending">Pending</span>
