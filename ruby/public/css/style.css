@@ -5,3 +5,21 @@ body {
 #content h2 {
   text-align: center;
 }
+
+#scoreboard li {
+  padding: 8px 35px 8px 14px;
+  margin-bottom: 20px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background-color: #95A5A6;
+  border: 1px solid #7F8C8D;
+}
+
+#scoreboard .score {
+  float: right;
+}
+
+#scoreboard {
+  font-weight: 600;
+}
