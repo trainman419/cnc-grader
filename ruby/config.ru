@@ -7,8 +7,9 @@ Bundler.require(:default)
 
 require 'bcrypt'
 
-require './grader'
 require "./datamap"
 require "./config"
+
+require './grader'
 
 run Sinatra::Application

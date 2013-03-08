@@ -3,13 +3,16 @@ enable :sessions
 DataMapper.auto_upgrade!
 
 get '/' do
+  @logged_in = false
   if session['user_id']
     @logged_in = true
 
     # Submission name format: Problem Name + File Name
     # TODO: enforce display format
-    @user_submissions = Submission.all(Submission.user.id => session['user_id'],
-                                 :order => [ :time.desc ])
+    @user_submissions = Submission.all(
+      Submission.user.id => session['user_id'],
+      :order => [ :time.desc ]
+    )
   end
 
   # Submission name format: Team Name + Problem Name
@@ -60,7 +63,7 @@ post '/problem' do
     end
 
     # Create database entry
-    s = Submission.new(:time => now, 
+    s = Submission.new(:time => now,
                    :filename => params['file'][:filename],
                    :archive => archive,
                    :problem => @problem,
@@ -70,7 +73,7 @@ post '/problem' do
       @error = "Failed to save Submission: " + s.errors.join(', ')
     end
 
-    erb :problem 
+    erb :problem
   else
     # if the user isn't logged in, throw away their upload and send them to
     # the login page
