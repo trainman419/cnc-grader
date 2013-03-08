@@ -3,7 +3,7 @@
 
    <h3>Languages</h3>
 
-   <p>Programs may be submitted in a number of languages. The grader is currently capable of dealing with C, C++, Java, Python, Perl, Ruby, Lua, Bash and Frink. Haskell support should work, but is untested because I don't have a reference implementation of the test problem in Haskell. Other scripting languages may also work, if you include the appropriate #! at the beginning of your file.</p>
+   <p>Programs may be submitted in a number of languages. The grader is currently capable of dealing with C, C++, Java, Python, Perl, Ruby, Lua, Bash and Frink. Haskell support should work, but is untested because I don't have a reference implementation of the test problem in Haskell. Other scripting languages may also work, if you include the appropriate #! at the beginning of your file. Exact language version information is available at the bottom of the page.</p>
    <p>If you are interested in support for another language, please write a solution to the "Ones" problem in that language and submit it for compatibility testing.</p>
 
    <h3>Input and Output</h3>
@@ -48,4 +48,17 @@ int main() {
    <pre>./a.out &lt; in1.txt | diff -wBb - out1.txt</pre>
 
    <p>The return code from diff is then used to determine if your program has passed or failed.</p>
+
+   <h3>Language Versions</h3>
+
+   <p>The exact versions for each language are listed below</p>
+   <ol>
+      <% @languages.each do |language| %>
+         <li>
+            <p><%= language[:name] %></p>
+            <pre><%= language[:version] %></pre>
+         </li>
+      <% end %>
+   </ol>
+
 </div>

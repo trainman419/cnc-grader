@@ -51,6 +51,25 @@ get '/about' do
     @logged_in = true
   end
 
+  @languages = [
+     { :name => "GCC", :cmd => "gcc --version" },
+     { :name => "Java", :cmd => "javac -version 2>&1" },
+     { :name => "Python", :cmd => "python -V 2>&1" },
+     { :name => "Perl", :cmd => "perl -v" },
+     { :name => "Ruby", :cmd => "ruby --version" },
+     { :name => "Lua", :cmd => "lua -v" },
+     { :name => "Bash", :cmd => "bash --version" }
+  ]
+
+  @languages.each do |language|
+     language[:version] = %x{ #{language[:cmd]} }
+     if $?.exitstatus != 0
+        language[:version] = "Error retrieving version"
+     elsif language[:version] === ""
+        language[:version] = "#{language[:cmd]} returned empty version string"
+     end
+  end
+
   erb :about
 end
 
