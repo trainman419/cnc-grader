@@ -40,8 +40,10 @@
             <% when 3 %>
               <span class="score-pending">Skipped</span>
             <% else %>
-              <span class="score-fail">Grader Error: <%= submission.note %></span>
+              <span class="score-fail">Grader Error</span>
             <% end %>
+
+            <span class="note"><%= submission.note %></span>
             </li>
           <% end %>
         </ol>
