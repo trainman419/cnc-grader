@@ -1,19 +1,21 @@
-<div class="navbar navbar-inverse">
-  <div class="navbar-inner">
-    <div class="container">
-      <div class="nav-collapse collapse">
-        <ul class="nav">
-          <li><a href="/">Scores</a></li>
-          <li><a href="/problem">Problem</a></li>
-          <% if @logged_in %>
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/logout">Logout</a></li>
-          <% else %>
-            <li><a href="/signup">Sign Up</a></li>
-            <li><a href="/login">Log In</a></li>
-          <% end %>
-        </ul>
-      </div><!--/.nav-collapse -->
+<div class="masthead">
+  <h3 class="muted">Crash and Compile Grader</h3>
+
+  <div class="navbar navbar-inverse">
+    <div class="navbar-inner">
+      <div class="container">
+          <ul class="nav">
+            <li><a href="/">Scores</a></li>
+            <li><a href="/problem">Problem</a></li>
+            <% if @logged_in %>
+              <li><a href="/settings">Settings</a></li>
+              <li><a href="/logout">Logout</a></li>
+            <% else %>
+              <li><a href="/signup">Sign Up</a></li>
+              <li><a href="/login">Log In</a></li>
+            <% end %>
+          </ul>
+      </div>
     </div>
   </div>
 </div>
