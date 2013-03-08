@@ -1,12 +1,3 @@
-require 'sinatra'
-require 'data_mapper'
-require 'bcrypt'
-require 'time'
-require 'fileutils'
-
-require "./datamap"
-require "./config"
-
 enable :sessions
 
 DataMapper.auto_upgrade!
