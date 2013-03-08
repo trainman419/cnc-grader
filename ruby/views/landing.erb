@@ -32,18 +32,18 @@
             <span class="submission_name"><%= submission.problem.name %>:
             <%= Rack::Utils.escape_html(submission.filename) %></span>
             <% case submission.result ; when 0 %>
-              <span class="score-pending">Pending</span>
+              <span class="score score-pending">
             <% when 1 %>
-              <span class="score-pass">Pass</span>
+              <span class="score score-pass">
             <% when 2 %>
-              <span class="score-fail">Fail</span>
+              <span class="score score-fail">
             <% when 3 %>
-              <span class="score-pending">Skipped</span>
+              <span class="score score-pending">
             <% else %>
-              <span class="score-fail">Grader Error</span>
+              <span class="score score-fail">Grader Error:
             <% end %>
 
-            <span class="note"><%= submission.note %></span>
+            <%= submission.note %></span>
             </li>
           <% end %>
         </ol>
