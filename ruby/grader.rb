@@ -1,4 +1,5 @@
 enable :sessions
+set :session_secret, (ENV['SESSION_SECRET'] || 'superSecret!1!')
 
 DataMapper.auto_upgrade!
 
