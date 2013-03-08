@@ -1,65 +1,93 @@
-<div id="title"><h1>Crash and Compile Grader</h1></div>
-
 <div id="content">
-  <div id="scoreboard">
-    <h2>Scoreboard</h2>
-    <ol>
-      <% @scoreboard.each do |team| %>
-        <li>
-        <span class="teamname"><%= Rack::Utils.escape_html(team[:name]) %></span>
-        <span class="score"><%= team[:score] %></span>
-        </li>
-      <% end %>
-    </ol>
-  </div>
-  <div id="submissions">
-    <% if @user_submissions %>
-      <h2>Your Submissions</h2>
+
+  <div class="row-fluid">
+    <div id="scoreboard" class="span6 offset3">
+      <h2>Scoreboard</h2>
       <ol>
-        <% @user_submissions.each do |submission| %>
+        <% @scoreboard.each do |team| %>
           <li>
-          <span class="submission_name"><%= submission.problem.name %>:
-            <%= Rack::Utils.escape_html(submission.filename) %></span>
-          <% case submission.result ; when 0 %>
-            <span class="score-pending">Pending</span>
-          <% when 1 %>
-            <span class="score-pass">
-          <% when 2 %>
-            <span class="score-fail">
-          <% when 3 %>
-            <span class="score-pending">
-          <% else %>
-            <span class="score-fail">Grader Error:
-          <% end %>
-          <%= submission.note %></span>
+          <span class="teamname"><%= Rack::Utils.escape_html(team[:name]) %></span>
+          <span class="score"><%= team[:score] %></span>
           </li>
         <% end %>
       </ol>
-    <% end %>
-    <h2>All Submissions</h2>
-    <ol>
-      <% @submissions.each do |submission| %>
-        <li>
-        <span class="submission_name">
-          <% if submission.user.team %>
-            <%= Rack::Utils.escape_html(submission.user.team.name) %>:
-          <% else %>
-            <%= Rack::Utils.escape_html(submission.user.name) %>:
+    </div>
+  </div>
+
+  <div class="row-fluid submission">
+    <% if @user_submissions %>
+      <div class="span6">
+        <h2>Your Submissions</h2>
+        <ol>
+          <% @user_submissions.each do |submission| %>
+            <li class="alert
+            <% case submission.result; when 1 %>
+              alert-success
+            <% when 2 %>
+              alert-error
+            <% when 3 %>
+              alert-info
+            <% end%>
+            ">
+            <span class="submission_name"><%= submission.problem.name %>:
+            <%= Rack::Utils.escape_html(submission.filename) %></span>
+            <% case submission.result ; when 0 %>
+              <span class="score-pending">Pending</span>
+            <% when 1 %>
+              <span class="score-pass">Pass</span>
+            <% when 2 %>
+              <span class="score-fail">Fail</span>
+            <% when 3 %>
+              <span class="score-pending">Skipped</span>
+            <% else %>
+              <span class="score-fail">Grader Error</span>
+            <% end %>
+
+            <span class="note"><%= submission.note %></span>
+            </li>
           <% end %>
-          <%= submission.problem.name %></span>
-        <% case submission.result ; when 0 %>
-          <span class="score-pending">Pending</span>
-        <% when 1 %>
-          <span class="score-pass">Pass</span>
-        <% when 2 %>
-          <span class="score-fail">Fail</span>
-        <% when 3 %>
-          <span class="score-pending">Skipped</span>
-        <% else %>
-          <span class="score-fail">Grader Error</span>
-        <% end %>
-        </li>
+        </ol>
+      </div>
+    <% end %>
+
+    <div class="span6
+      <% if !@user_submissions %>
+        offset3
       <% end %>
-    </ol>
+      ">
+      <h2>All Submissions</h2>
+      <ol>
+        <% @submissions.each do |submission| %>
+          <li class="alert
+            <% case submission.result; when 1 %>
+              alert-success
+            <% when 2 %>
+              alert-error
+            <% when 3 %>
+              alert-info
+            <% end%>
+            ">
+          <span class="submission_name">
+            <% if submission.user.team %>
+              <%= Rack::Utils.escape_html(submission.user.team.name) %>:
+            <% else %>
+              <%= Rack::Utils.escape_html(submission.user.name) %>:
+            <% end %>
+            <%= submission.problem.name %></span>
+          <% case submission.result ; when 0 %>
+            <span class="score-pending">Pending</span>
+          <% when 1 %>
+            <span class="score-pass">Pass</span>
+          <% when 2 %>
+            <span class="score-fail">Fail</span>
+          <% when 3 %>
+            <span class="score-pending">Skipped</span>
+          <% else %>
+            <span class="score-fail">Grader Error</span>
+          <% end %>
+          </li>
+        <% end %>
+      </ol>
+    </div>
   </div>
 </div>
