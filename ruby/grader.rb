@@ -21,7 +21,21 @@ get '/' do
 
   # pull scoreboard data from DB
   @scoreboard = Team.all(:order => [ :score.desc ])
-  #@scoreboard.push({ :name => 'Test Team', :score => 5 })
+
+  # Test Data
+  @scoreboard.push({ :name => 'Test Team', :score => 5 })
+  if @user_submissions
+    @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 0, :filename => 'test.rb' )
+    @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 1, :filename => 'test.rb' )
+    @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 2, :filename => 'test.rb' )
+    @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 3, :filename => 'test.rb' )
+    @user_submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 4, :filename => 'test.rb' )
+  end
+  @submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 0 )
+  @submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 1 )
+  @submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 2 )
+  @submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 3 )
+  @submissions.push( :user => { :name => 'fake' }, :problem => { :name => 'Ones' }, :result => 4 )
 
   erb :landing
 end
