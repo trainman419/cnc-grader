@@ -104,10 +104,8 @@ post '/problem' do
     end
 
     # Archive file
-    archive = File.join(user_archive_dir, now.to_s() + '-' + params['file'][:filename])
-    File.open(archive, "w") do |f|
-      f.write(params['file'][:tempfile].read)
-    end
+    archive = File.join(user_archive_dir, now.strftime("%F-%T") + '-' + params['file'][:filename])
+    FileUtils.cp(filename, archive)
 
     # Create database entry
     s = Submission.new(:time => now,
