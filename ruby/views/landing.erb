@@ -15,8 +15,8 @@
   </div>
 
   <div class="row-fluid submission">
-    <div class="span6">
-      <% if @user_submissions %>
+    <% if @user_submissions %>
+      <div class="span6">
         <h2>Your Submissions</h2>
         <ol>
           <% @user_submissions.each do |submission| %>
@@ -45,10 +45,14 @@
             </li>
           <% end %>
         </ol>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
 
-    <div class="span6">
+    <div class="span6
+      <% if !@user_submissions %>
+        offset3
+      <% end %>
+      ">
       <h2>All Submissions</h2>
       <ol>
         <% @submissions.each do |submission| %>
