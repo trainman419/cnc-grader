@@ -29,7 +29,8 @@
               alert-info
             <% end%>
             ">
-            <span class="submission_name"><%= submission.problem.name %>:
+            <span class="submission_name"> <%= submission.problem.name %>(<%= 
+                   Rack::Utils::escape_html(submission.user.name) %>):
             <%= Rack::Utils.escape_html(submission.filename) %></span>
             <% case submission.result ; when 0 %>
               <span class="score score-pending">

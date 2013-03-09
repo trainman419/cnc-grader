@@ -10,16 +10,23 @@ get '/' do
     @logged_in = true
 
     # Submission name format: Problem Name + File Name
-    # TODO: enforce display format
-    @user_submissions = Submission.all(
-      Submission.user.id => session['user_id'],
-      :order => [ :time.desc ],
-      :limit => SUBMISSION_COUNT,
-    )
+    user = User.get(session['user_id'])
+
+    # If the user is on a team, pull all of the team's submissions
+    if user.team    
+       @user_submissions = Submission.all(
+          Submission.user.team.id => user.team.id,
+          :order => [ :time.desc ],
+          :limit => SUBMISSION_COUNT)
+    else
+       @user_submissions = Submission.all(
+          Submission.user.id => session['user_id'],
+          :order => [ :time.desc ],
+          :limit => SUBMISSION_COUNT)
+    end
   end
 
   # Submission name format: Team Name + Problem Name
-  # TODO: enforce display format
   @submissions = Submission.all(
     :order => [ :time.desc ],
     :limit => SUBMISSION_COUNT,
