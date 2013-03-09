@@ -76,15 +76,15 @@
             <% end %>
             <%= submission.problem.name %></span>
           <% case submission.result ; when 0 %>
-            <span class="score-pending">Pending</span>
+            <span class="score score-pending">Pending</span>
           <% when 1 %>
-            <span class="score-pass">Pass</span>
+            <span class="score score-pass">Pass</span>
           <% when 2 %>
-            <span class="score-fail">Fail</span>
+            <span class="score score-fail">Fail</span>
           <% when 3 %>
-            <span class="score-pending">Skipped</span>
+            <span class="score score-pending">Skipped</span>
           <% else %>
-            <span class="score-fail">Grader Error</span>
+            <span class="score score-fail">Grader Error</span>
           <% end %>
           </li>
         <% end %>

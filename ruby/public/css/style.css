@@ -16,7 +16,7 @@ body {
   border: 1px solid #7F8C8D;
 }
 
-#scoreboard .score {
+.score {
   float: right;
 }
 
